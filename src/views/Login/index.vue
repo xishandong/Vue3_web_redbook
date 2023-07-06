@@ -128,7 +128,7 @@ const toggleForm = () => {
               <el-input v-model="formLogin.account" placeholder="请输入用户名" :prefix-icon="User"/>
             </el-form-item>
             <el-form-item prop="password" class="inputArea">
-              <el-input v-model="formLogin.password" placeholder="请输入密码" :prefix-icon="Lock"/>
+              <el-input v-model="formLogin.password" placeholder="请输入密码" :prefix-icon="Lock" show-password/>
             </el-form-item>
             <el-form-item prop="agree" label-width="22px" class="inputArea">
               <el-checkbox size="large" v-model="formLogin.agree">
@@ -151,10 +151,10 @@ const toggleForm = () => {
               <el-input v-model="formRegister.account" placeholder="请输入注册邮箱" :prefix-icon="User"/>
             </el-form-item>
             <el-form-item prop="password" class="inputArea">
-              <el-input v-model="formRegister.password" placeholder="请输入密码" :prefix-icon="Lock"/>
+              <el-input v-model="formRegister.password" placeholder="请输入密码" :prefix-icon="Lock" show-password/>
             </el-form-item>
             <el-form-item prop="retryPwd" class="inputArea">
-              <el-input v-model="formRegister.retryPwd" placeholder="请确认输入密码" :prefix-icon="Lock"/>
+              <el-input v-model="formRegister.retryPwd" placeholder="请确认输入密码" :prefix-icon="Lock" show-password/>
             </el-form-item>
             <el-form-item prop="agree" label-width="22px" class="inputArea">
               <el-checkbox size="large" v-model="formRegister.agree">
