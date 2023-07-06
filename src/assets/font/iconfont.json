@@ -1,0 +1,51 @@
+{
+  "id": "",
+  "name": "",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "1228",
+      "name": "首页",
+      "font_class": "shouye",
+      "unicode": "f012b",
+      "unicode_decimal": 983339
+    },
+    {
+      "icon_id": "1309",
+      "name": "退出",
+      "font_class": "tuichu",
+      "unicode": "f017c",
+      "unicode_decimal": 983420
+    },
+    {
+      "icon_id": "2418274",
+      "name": "右箭头",
+      "font_class": "youjiantou",
+      "unicode": "e678",
+      "unicode_decimal": 59000
+    },
+    {
+      "icon_id": "3325491",
+      "name": "二维码",
+      "font_class": "erweima",
+      "unicode": "e61b",
+      "unicode_decimal": 58907
+    },
+    {
+      "icon_id": "5651485",
+      "name": "汉堡菜单",
+      "font_class": "hanbaocaidan",
+      "unicode": "e675",
+      "unicode_decimal": 58997
+    },
+    {
+      "icon_id": "10463895",
+      "name": "图片",
+      "font_class": "tupian",
+      "unicode": "e629",
+      "unicode_decimal": 58921
+    }
+  ]
+}
