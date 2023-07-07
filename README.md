@@ -5,6 +5,7 @@
 ### 使用
 
 ``` bash
+npm update
 npm run build
 npm run dev
 ```
