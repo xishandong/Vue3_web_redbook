@@ -26,7 +26,7 @@ const changeShow = () => {
     <div class="actionsBar">
       <div>
         <button id="menuBtn" type="button" @click="toggleMenu"><i class="iconfont icon-hanbaocaidan"></i></button>
-        <h3 class="menuText" :class="{ open2: isMenuOpen }">{{ userStore.userInfo.name }}</h3>
+        <h3 class="menuText" :class="{ open2: isMenuOpen }">{{ userStore.userInfo.username }}</h3>
       </div>
     </div>
     <ul class="optionsBar">
@@ -40,7 +40,7 @@ const changeShow = () => {
         <hr>
       </li>
       <li class="menuItem">
-        <RouterLink to="/" class="menuOption">
+        <RouterLink to="/user/uploads" class="menuOption">
           <el-icon size="x-large">
             <Promotion/>
           </el-icon>
@@ -56,7 +56,7 @@ const changeShow = () => {
           <div>
             <img :src="userStore.userInfo.avatar" alt="">
           </div>
-          <h5 class="Username menuText" :class="{ open2: isMenuOpen }">{{ userStore.userInfo.name }}</h5>
+          <h5 class="Username menuText" :class="{ open2: isMenuOpen }">{{ userStore.userInfo.username }}</h5>
           <p class="menuText" :class="{ open2: isMenuOpen }"><i class="iconfont icon-youjiantou"></i></p>
         </RouterLink>
       </div>

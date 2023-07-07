@@ -65,7 +65,7 @@ const rulesRegister = {
 }
 const rulesLogin = {
   account: [
-    {required: true, message: '不是合法的邮箱', trigger: 'blur'}
+    {required: true, message: '用户名不能为空！', trigger: 'blur'}
   ],
   password: [
     {required: true, message: '密码不能为空', trigger: 'blur'},
@@ -172,15 +172,17 @@ const toggleForm = () => {
 </template>
 
 <style scoped>
-.image{
+.image {
   position: absolute;
   left: 50px;
   top: 150px;
+  object-fit: contain;
 }
+
 .title {
   margin-top: 50px;
   font-size: 18px;
-  color: rgba(51,51,51,0.8);
+  color: rgba(51, 51, 51, 0.8);
   font-weight: 600;
   line-height: 120%;
 }

@@ -20,21 +20,21 @@ const comment = (id) => {
 
 <template>
   <div class="box" v-if="detail">
-    <el-card style="border-radius: 0.8rem;" >
+    <el-card style="border-radius: 0.8rem;">
       <el-row :gutter="50">
         <el-col :span="50">
           <div class="banner">
             <el-carousel height="600px">
               <el-carousel-item v-for="item in detail.imgs" :key="item">
-                <img class="image"
+                <img  class="image"
                      :src="item"
-                     alt="">
+                     alt="" />
               </el-carousel-item>
             </el-carousel>
           </div>
         </el-col>
         <el-col :span="50">
-          <div class="info">
+          <div class="info" style="width: 500px;">
             <el-row style="align-items: center;width: 500px;">
               <el-avatar :src="detail.user.avatar" size="large"/>
               <div class="username">{{ detail.user.username }}</div>
@@ -45,7 +45,7 @@ const comment = (id) => {
                 <h2>{{ detail.title }}</h2>
               </el-row>
               <el-row>
-                <p>{{ detail.content }}</p>
+                <div class="content">{{ detail.content }}</div>
               </el-row>
               <el-row>
                 <time class="time">{{ detail.createTime }}</time>
@@ -53,6 +53,23 @@ const comment = (id) => {
               <hr/>
               <div class="comments">
                 <el-empty description="现在还没有评论" v-if="detail.comment.length === 0"/>
+                <div v-else class="commentBox">
+                  <div class="commentTitle" style="margin-bottom: 10px;">共{{ detail.comment.length }}条评论</div>
+                  <div v-for="item in detail.comment" :key="item.id">
+                    <el-row :gutter="20">
+                      <el-col :span="2.5">
+                        <el-avatar :src="item.user.avatar" :size="30"></el-avatar>
+                      </el-col>
+                      <el-col :span="20" style="font-size: 14px">
+                        <div style="color:#33333399;">{{ item.user.username }}</div>
+                        <div style="color:#333333;margin-top: 2px;margin-bottom: 10px;">{{ item.content }}</div>
+                        <time class="time">{{ item.createTime }}</time>
+                      </el-col>
+                    </el-row>
+                    <el-divider/>
+
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -67,6 +84,22 @@ const comment = (id) => {
 </template>
 
 <style scoped>
+.content {
+  margin: 0;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 28px;
+  color: #333;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.commentTitle {
+  font-size: 14px;
+  line-height: 18px;
+  color: #666;
+}
+
 .box {
   position: absolute;
   left: 200px;
@@ -74,6 +107,7 @@ const comment = (id) => {
   border-radius: 0.8rem;
   width: 1200px;
   height: 600px;
+  overflow-y: scroll;
 }
 
 .banner {
@@ -103,6 +137,7 @@ const comment = (id) => {
   width: 600px;
   height: 600px;
   border-radius: 0.8rem;
+  object-fit: contain;
 }
 
 .main-content::-webkit-scrollbar {

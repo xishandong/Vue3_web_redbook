@@ -8,7 +8,11 @@ const detail = ref({});
 const getDetail = () => {
   detail.value = {
     title: '这是标题',
-    content: '这是内容',
+    content: '1提前购买战袍\n' +
+        '·离职前7天购入，我选择的是这件《I am not doing sh*t today》在忙碌的办公室里晃悠非常拉仇恨，亲测很爽\n' +
+        '\n' +
+        '2早点到公司吃早饭\n' +
+        '·重度回本项目之一，因为公司的早餐真的很丰盛，咱就是各个餐道甜的咸的荤的素的都来点，离开字节再也没人能让我早起吃饭',
     user: {
       id: 1,
       username: '用户0',
@@ -27,7 +31,29 @@ const getDetail = () => {
           avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
           id: 2
         },
-        content: '我是一条评论'
+        content: '我是一条评论',
+        id: 1,
+        createTime: '2023-07-07'
+      },
+      {
+        user: {
+          username: '用户1',
+          avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
+          id: 2
+        },
+        content: '我是一条评论',
+        id: 2,
+        createTime: '2023-07-07'
+      },
+      {
+        user: {
+          username: '用户1',
+          avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
+          id: 2
+        },
+        content: '条评论我是一条评论我是一条评论我是一条评论我是一条评论',
+        id: 2,
+        createTime: '2023-07-07'
       }
     ]
   }

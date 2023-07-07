@@ -30,8 +30,8 @@ const details = (id) => {
           <el-row style="align-items: center;">
             <a :href="`/user/index/${card.user.id}`">
               <el-avatar
-                :src="card.user.avatar" size="small"
-            />
+                  :src="card.user.avatar" size="small"
+              />
             </a>
             <div class="username">{{ card.user.username }}</div>
           </el-row>
@@ -58,6 +58,7 @@ section {
   width: 250px;
   max-height: 250px;
   border-radius: 0.8rem;
+  object-fit: contain;
 }
 
 .image:hover {
