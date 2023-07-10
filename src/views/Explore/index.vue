@@ -1,390 +1,77 @@
 <script setup>
-import {ref} from "vue";
+import { onMounted, ref } from "vue";
 import HomeCard from "@/components/homeCard.vue";
-import {Back} from "@element-plus/icons-vue";
+import { Back } from "@element-plus/icons-vue";
 import CardDetail from "@/components/cardDetail.vue";
+import { postDetail, queryPost } from "@/apis/main";
 
 // 主页卡片
-const cards = ref([
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '1',
-    title: '我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    // img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '1',
-    title: '我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    // img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '1',
-    title: '我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'http://101.132.149.112/static/img/avatar-1-%E9%87%91%E7%8F%8D%E5%A6%AE.jpg',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'http://101.132.149.112/static/img/avatar-1-%E9%87%91%E7%8F%8D%E5%A6%AE.jpg',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '1',
-    title: '我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    // img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '1',
-    title: '我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    // img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '1',
-    title: '我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'http://101.132.149.112/static/img/avatar-1-%E9%87%91%E7%8F%8D%E5%A6%AE.jpg',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'http://101.132.149.112/static/img/avatar-1-%E9%87%91%E7%8F%8D%E5%A6%AE.jpg',
-      username: '用户名'
-    }
+const cards = ref([]);
+const detail = ref({});
+const disabled = ref(true); // 初始禁用滚动加载
+
+// 主页获取帖子
+const doQuery = async (offset) => {
+  const res = await queryPost({ offset });
+  cards.value = res.info;
+  disabled.value = false; // 启用滚动加载
+};
+
+// 无限滚动
+const load = async () => {
+  disabled.value = true;
+  const offset = cards.value.length;
+  const res = await queryPost({ offset });
+  const more = res.info;
+  if (more.length === 0) {
+    disabled.value = true; // 没有更多数据，禁用滚动加载
+  } else {
+    cards.value = [...cards.value, ...more];
+    disabled.value = false;
   }
-])
-const detail = ref({})
-const disabled = ref(false)
-const load = () => {
-  let temp = [
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '1',
-    title: '我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    // img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '1',
-    title: '我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    // img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '1',
-    title: '我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'http://101.132.149.112/static/img/avatar-1-%E9%87%91%E7%8F%8D%E5%A6%AE.jpg',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'http://101.132.149.112/static/img/avatar-1-%E9%87%91%E7%8F%8D%E5%A6%AE.jpg',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '1',
-    title: '我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    // img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '1',
-    title: '我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    // img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '1',
-    title: '我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      username: '用户名'
-    }
-  },
-  {
-    img: 'http://101.132.149.112/static/img/avatar-1-%E9%87%91%E7%8F%8D%E5%A6%AE.jpg',
-    id: '2',
-    title: '我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题我是标题',
-    user: {
-      avatar: 'http://101.132.149.112/static/img/avatar-1-%E9%87%91%E7%8F%8D%E5%A6%AE.jpg',
-      username: '用户名'
-    }
-  }
-]
-  cards.value = [...cards.value, ...temp]
-  // disabled.value = true
-}
+};
 
 // 卡片详情
-const show = ref(false)
-const getDetails = () => {
-  return {
-    title: '这是标题',
-    content: '这是内容',
-    user: {
-      id: 1,
-      username: '用户0',
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
-    },
-    imgs: [
-      'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-      'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-      'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip'
-    ],
-    createTime: '2023-10-18',
-    comment: [],
-  }
-}
+const show = ref(false);
+const getDetails = async (id) => {
+  const res = await postDetail({ id });
+  return res.info;
+};
 const showMessage = async (id) => {
-  window.history.pushState({}, '', `/explore/${id}`);
-  detail.value = getDetails()
-  show.value = true
-}
+  window.history.pushState({}, "", `/explore/${id}`);
+  overlayX.value = event.clientX;
+  overlayY.value = event.clientY;
+  detail.value = await getDetails(id);
+  show.value = true;
+};
 const close = () => {
-  window.history.pushState({}, '', `/`);
-  show.value = false
-}
+  window.history.pushState({}, "", "/");
+  show.value = false;
+};
+const overlayX = ref(0); // 覆盖层的水平位置
+const overlayY = ref(0); // 覆盖层的垂直位置
 
+onMounted(async () => {
+  await doQuery(0);
+});
 </script>
 
 <template>
   <div class="container" v-infinite-scroll="load" :infinite-scroll-disabled="disabled">
     <home-card :cards="cards" @show-detail="showMessage"></home-card>
   </div>
-  <div class="overlay" v-if="show">
-    <button class="backPage" @click="close">
-      <el-icon>
-        <Back/>
-      </el-icon>
-    </button>
-    <card-detail :detail="detail"/>
-  </div>
+  <transition name="fade">
+    <div class="overlay" v-if="show" :style="{ transformOrigin: `${overlayX}px ${overlayY}px` }">
+      <button class="backPage" @click="close">
+        <el-icon>
+          <Back/>
+        </el-icon>
+      </button>
+      <card-detail :detail="detail"/>
+    </div>
+  </transition>
 </template>
+
 
 <style scoped>
 .container {
@@ -400,7 +87,75 @@ const close = () => {
   height: 100%;
   background-color: white; /* 设置透明度的背景色 */
   z-index: 9999; /* 设置一个较大的z-index值，确保图层位于其他内容之上 */
+  animation: scaleIn 0.5s forwards;
 }
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0);
+  }
+  5% {
+    transform: scale(0.1);
+  }
+  10% {
+    transform: scale(0.2);
+  }
+  15% {
+    transform: scale(0.3);
+  }
+  20% {
+    transform: scale(0.4);
+  }
+  25% {
+    transform: scale(0.5);
+  }
+  30% {
+    transform: scale(0.6);
+  }
+  35% {
+    transform: scale(0.7);
+  }
+  40% {
+    transform: scale(0.8);
+  }
+  45% {
+    transform: scale(0.9);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  55% {
+    transform: scale(0.97);
+  }
+  60% {
+    transform: scale(0.98);
+  }
+  65% {
+    transform: scale(0.99);
+  }
+  70% {
+    transform: scale(0.995);
+  }
+  75% {
+    transform: scale(0.997);
+  }
+  80% {
+    transform: scale(0.998);
+  }
+  85% {
+    transform: scale(0.999);
+  }
+  90% {
+    transform: scale(0.9995);
+  }
+  95% {
+    transform: scale(0.9997);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 
 .backPage {
   position: fixed;
@@ -416,5 +171,14 @@ const close = () => {
   transition: all .3s;
 }
 
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.5s;
+}
 
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+  transform: scale(0.5);
+}
 </style>

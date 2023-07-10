@@ -5,6 +5,8 @@ import {computed, onBeforeMount, ref} from "vue";
 import {Back, Plus} from '@element-plus/icons-vue'
 import {ElMessage} from "element-plus";
 import CardDetail from "@/components/cardDetail.vue";
+import {getCurrentTime} from "@/utils/getTime";
+import {uploadPost} from "@/apis/main";
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -22,18 +24,47 @@ const title = ref('')
 const content = ref('')
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
+const postData = ref({})
+const Post = ref({})
+const PostId = ref(0)
 
 const handlePictureCardPreview = (uploadFile) => {
   dialogImageUrl.value = uploadFile.url
   dialogVisible.value = true
 }
 const handleRemove = (uploadFile, uploadFiles) => {
-  console.log(uploadFile, uploadFiles)
 }
 const upload = ref(null)
-const doUploads = () => {
-  upload.value.submit()
+const beforeUpload = () => {
+  Post.value = {
+    id: PostId.value
+  }
 }
+const doUploads = async () => {
+  if (fileListUrl.value.length === 0) {
+    ElMessage.warning(
+        '请至少上传一张图片!'
+    )
+    return
+  }
+  if (title.value === '') {
+    ElMessage.warning(
+        '请输入标题'
+    )
+    return
+  }
+  const data = {
+    title: title.value,
+    content: content.value,
+    user_id: userStore.userInfo.id,
+  }
+  const res = await uploadPost(data)
+  PostId.value = res.info
+  upload.value.submit()
+  ElMessage.info({type: 'success', message: '发布成功，跳转到主页'})
+  await router.replace('/')
+}
+
 const handleExceed = () => {
   ElMessage.warning(
       '最多可以添加9张图片哦!'
@@ -41,7 +72,6 @@ const handleExceed = () => {
 }
 
 const show = ref(false)
-const detail = ref({})
 const close = () => {
   show.value = false
 }
@@ -59,13 +89,13 @@ const MakePrev = () => {
     )
     return
   }
-  detail.value = {
+  postData.value = {
     title: title.value,
     content: content.value,
     user: userStore.userInfo,
     comment: [],
     imgs: fileListUrl.value,
-    createdTime: '2023-07-07'
+    createTime: getCurrentTime()
   }
   show.value = true
 }
@@ -79,15 +109,18 @@ const MakePrev = () => {
         <div class="img-container">
           <el-upload
               v-model:file-list="fileList"
+              action="http://localhost:8000/upload/"
               class="preview"
               ref="upload"
-              action="http://127.0.0.1:8000/upload/"
               list-type="picture-card"
+              multiple
               :limit="9"
               :on-preview="handlePictureCardPreview"
               :on-remove="handleRemove"
               :auto-upload="false"
               :on-exceed="handleExceed"
+              :data="Post"
+              :before-upload="beforeUpload"
           >
             <el-icon>
               <Plus/>
@@ -122,7 +155,8 @@ const MakePrev = () => {
       </div>
     </el-col>
     <el-col :span="50">
-      <el-button style="margin-top: 150px;color:white;" round color="#fd5656" size="large">发布推文</el-button>
+      <el-button style="margin-top: 150px;color:white;" round color="#fd5656" size="large" @click="doUploads">发布推文
+      </el-button>
       <br>
       <el-button style="margin-top: 200px;" round type="primary" size="large" @click="MakePrev">生成预览</el-button>
     </el-col>
@@ -139,7 +173,7 @@ const MakePrev = () => {
         <Back/>
       </el-icon>
     </button>
-    <card-detail :detail="detail"/>
+    <card-detail :detail="postData"/>
   </div>
 </template>
 

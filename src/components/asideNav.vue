@@ -3,6 +3,7 @@ import {ref} from "vue";
 import {Promotion, Expand, Close} from "@element-plus/icons-vue";
 import {useUserStore} from "@/stores/user";
 import Login from '@/views/Login/index.vue'
+import {ElMessage} from "element-plus";
 // user
 const userStore = useUserStore()
 // control menu condition
@@ -12,8 +13,9 @@ const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
 }
 // logout
-const confirm = () => {
-  userStore.userLogout()
+const confirm = async () => {
+  const res = await userStore.userLogout()
+  ElMessage({type:'success', message: res.info})
 }
 const show = ref(false)
 const changeShow = () => {
@@ -56,7 +58,7 @@ const changeShow = () => {
           <div>
             <img :src="userStore.userInfo.avatar" alt="">
           </div>
-          <h5 class="Username menuText" :class="{ open2: isMenuOpen }">{{ userStore.userInfo.username }}</h5>
+          <h5 class="Username menuText" :class="{ open2: isMenuOpen }" v-show="isMenuOpen">{{ userStore.userInfo.username }}</h5>
           <p class="menuText" :class="{ open2: isMenuOpen }"><i class="iconfont icon-youjiantou"></i></p>
         </RouterLink>
       </div>
@@ -85,7 +87,7 @@ const changeShow = () => {
   </nav>
   <div class="overlay" v-if="show">
     <el-button class="close" @click="changeShow" plain round><el-icon size="x-large"><Close /></el-icon></el-button>
-    <login/>
+    <login @changeShow="changeShow"/>
   </div>
 </template>
 

@@ -17,3 +17,6 @@ body {
   scrollbar-color: transparent transparent; /* 设置滚动条颜色为透明 */
   overflow: hidden;
 }
+.el-message {
+  z-index: 99999 !important;
+}

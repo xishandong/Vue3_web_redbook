@@ -12,7 +12,7 @@
         <aside-nav/>
       </el-aside>
       <el-main class="maxSize">
-        <RouterView/>
+        <RouterView :key="$route.fullPath"/>
       </el-main>
     </el-container>
   </el-container>

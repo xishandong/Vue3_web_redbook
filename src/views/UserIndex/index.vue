@@ -1,25 +1,18 @@
 <script setup>
 import {useRoute} from "vue-router";
-import {onBeforeMount, onMounted, ref} from "vue";
+import {onMounted, ref} from "vue";
 import HomeCard from "@/components/homeCard.vue";
 import CardDetail from "@/components/cardDetail.vue";
 import {Back} from "@element-plus/icons-vue";
+import {queryUserIndex, postDetail} from "@/apis/main";
 
 const route = useRoute()
 const userInfo = ref({})
 const radio = ref('帖子')
-const getUserInfo = () => {
-  console.log(route.params.id)
-  userInfo.value = {
-    user: {
-      id: 1,
-      username: '用户0',
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-      fans: 15,
-      focusOn: 15
-    },
-    posts: []
-  }
+const getUserInfo = async () => {
+  const id = route.params.id
+  const res = await queryUserIndex({id})
+  userInfo.value = res.data
 }
 
 const Toggle = () => {
@@ -28,27 +21,13 @@ const Toggle = () => {
 const detail = ref({})
 // 卡片详情
 const show = ref(false)
-const getDetails = () => {
-  return {
-    title: '这是标题',
-    content: '这是内容',
-    user: {
-      id: 1,
-      username: '用户0',
-      avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
-    },
-    imgs: [
-      'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-      'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip',
-      'https://sns-img-hw.xhscdn.com/0ba64dcb-5292-3680-a306-760f409f8b1a?imageView2/2/w/1920/format/webp|imageMogr2/strip'
-    ],
-    createTime: '2023-10-18',
-    comment: [],
-  }
+const getDetails = async (id) => {
+  const res = await postDetail({id})
+  return res.info
 }
 const showMessage = async (id) => {
   window.history.pushState({}, '', `/explore/${id}`);
-  detail.value = getDetails()
+  detail.value = await getDetails(id)
   show.value = true
 }
 const close = () => {
@@ -56,23 +35,24 @@ const close = () => {
   show.value = false
 }
 
-onBeforeMount(() => getUserInfo())
-
+onMounted(async () => {
+  await getUserInfo()
+})
 </script>
 
 <template>
-  <div class="userInfo">
+  <div class="userInfo" v-if="userInfo.user">
     <el-row :gutter="20">
       <el-col :span="10" style="width: 250px;">
         <el-avatar :size="150" :src="userInfo.user.avatar"></el-avatar>
       </el-col>
       <el-col :span="10" style="width: 250px;">
         <h2>{{ userInfo.user.username }}</h2>
-        <p>个人标语</p>
+        <p>{{ userInfo.user.signature }}</p>
         <div class="tagArea">
           <el-tag class="ml-2" type="success" round>{{ userInfo.user.focusOn }} 关注</el-tag>
           <el-tag class="ml-2" type="info" round>{{ userInfo.user.fans }} 粉丝</el-tag>
-          <el-tag class="ml-2" type="warning" round>{{ userInfo.posts.length }} 笔记数</el-tag>
+          <el-tag class="ml-2" type="warning" round>{{ userInfo.user.postsCount }} 笔记数</el-tag>
         </div>
       </el-col>
     </el-row>
@@ -84,7 +64,7 @@ onBeforeMount(() => getUserInfo())
       <el-radio-button class="radio" label="点赞" name="like"/>
     </el-radio-group>
   </div>
-  <div style="margin-top: 30px;">
+  <div style="margin-top: 30px;" v-if="userInfo.user">
     <div v-if="radio === '帖子'">
       <div v-if="userInfo.posts.length === 0">
         <el-empty description="现在还没有帖子..."/>
@@ -102,10 +82,36 @@ onBeforeMount(() => getUserInfo())
       </div>
     </div>
     <div v-else-if="radio === '收藏'">
-      <el-empty description="现在还没有收藏..."/>
+      <div v-if="userInfo.collected.length === 0">
+        <el-empty description="现在还没有收藏..."/>
+      </div>
+      <div class="container" v-else>
+        <home-card :cards="userInfo.collected" @show-detail="showMessage"></home-card>
+      </div>
+      <div class="overlay" v-if="show">
+        <button class="backPage" @click="close">
+          <el-icon>
+            <Back/>
+          </el-icon>
+        </button>
+        <card-detail :detail="detail"/>
+      </div>
     </div>
     <div v-else-if="radio === '点赞'">
-      <el-empty description="现在还没有点赞..."/>
+      <div v-if="userInfo.favorites.length === 0">
+        <el-empty description="现在还没有点赞..."/>
+      </div>
+      <div class="container" v-else>
+        <home-card :cards="userInfo.favorites" @show-detail="showMessage"></home-card>
+      </div>
+      <div class="overlay" v-if="show">
+        <button class="backPage" @click="close">
+          <el-icon>
+            <Back/>
+          </el-icon>
+        </button>
+        <card-detail :detail="detail"/>
+      </div>
     </div>
   </div>
 </template>

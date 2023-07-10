@@ -1,23 +1,27 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
+import {login, Register} from "@/apis/main";
 
-export const useUserStore =
-    defineStore('user', ()=>{
+export const useUserStore
+    = defineStore('user', () => {
         const userInfo = ref({})
-        userInfo.value = {
-            id: 1,
-            username: '西山',
-            avatar: 'https://sns-avatar-qc.xhscdn.com/avatar/6432472e3efe33e0b0d55517.jpg?imageView2/2/w/540/format/webp|imageMogr2/strip'
+        const userRegister = async ({email, username, password}) => {
+            await Register({email, username, password})
         }
-        const getUserInfo = () => {
-            console.log('hello')
+        const getUserInfo = async ({email, password}) => {
+            userInfo.value = await login({email, password})
         }
-        const userLogout = () => {
+        const userLogout = async () => {
             userInfo.value = {}
+            return {'info': '成功退出登录'}
         }
         return {
             userInfo,
             getUserInfo,
-            userLogout
+            userLogout,
+            userRegister
         }
+    },
+    {
+        persist: true,
     })
