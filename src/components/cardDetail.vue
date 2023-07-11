@@ -1,8 +1,9 @@
 <script setup>
 import {Edit} from "@element-plus/icons-vue";
 import {ref} from "vue";
-import {doComment} from "@/apis/main";
+import {doComment, doFocus, unFollow} from "@/apis/main";
 import {ElMessage} from "element-plus";
+import {useUserStore} from "@/stores/user";
 
 defineProps({
   detail: {
@@ -11,11 +12,26 @@ defineProps({
 })
 // 子传父
 const emit = defineEmits(['afterDoComment'])
+// 评论内容
 const content = ref('')
-const doFocusOn = (id) => {
-  console.log(id)
+const userStore = useUserStore()
+const doFocusOn = async (id) => {
+  if (userStore.userInfo.id === id) {
+    ElMessage({type: 'warning', message: '不能对自己进行关注操作'})
+    return
+  }
+  const res = await doFocus({id})
+  userStore.extendUserInfo(id)
+  ElMessage({type: 'success', message: res.info})
 }
-
+const cancelFocusOn = async (id) => {
+  const res = await unFollow({id})
+  userStore.removeFocus(id)
+  ElMessage({type: 'success', message: res.info})
+}
+const checkFollow = (id) => {
+  return userStore.userFocus.includes(id)
+}
 const comment = async (post, to) => {
   const data = {
     post_id: post.id,
@@ -27,7 +43,6 @@ const comment = async (post, to) => {
   ElMessage({type: 'success', message: res.info})
   emit('afterDoComment', data)
 }
-
 </script>
 
 <template>
@@ -38,9 +53,9 @@ const comment = async (post, to) => {
           <div class="banner">
             <el-carousel height="600px">
               <el-carousel-item v-for="item in detail.imgs" :key="item">
-                <img  class="image"
+                <img class="image"
                      :src="item"
-                     alt="" />
+                     alt=""/>
               </el-carousel-item>
             </el-carousel>
           </div>
@@ -50,7 +65,14 @@ const comment = async (post, to) => {
             <el-row style="align-items: center;width: 500px;">
               <el-avatar :src="detail.user.avatar" size="large"/>
               <div class="username">{{ detail.user.username }}</div>
-              <button class="focusOn" @click="doFocusOn(detail.user.id)">关注</button>
+              <el-popconfirm @confirm="cancelFocusOn(detail.user.id)" title="确认取消关注吗?" confirm-button-text="确认"
+                             v-if="checkFollow(detail.user.id)"
+                             cancel-button-text="取消">
+                <template #reference>
+                  <button class="focusOn">已关注</button>
+                </template>
+              </el-popconfirm>
+              <button class="focusOn" v-else @click="doFocusOn(detail.user.id)">关注</button>
             </el-row>
             <div class="main-content">
               <el-row style="margin-top: 20px;">

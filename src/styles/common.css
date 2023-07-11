@@ -1,11 +1,11 @@
 /* 针对Webkit内核浏览器（Chrome、Safari）的滚动条样式设置 */
 ::-webkit-scrollbar {
-  width: 0.1em; /* 设置滚动条宽度为0.1em */
-  background-color: transparent; /* 设置滚动条背景颜色为透明 */
+    width: 0.1em; /* 设置滚动条宽度为0.1em */
+    background-color: transparent; /* 设置滚动条背景颜色为透明 */
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: transparent; /* 设置滚动条拖动块的颜色为透明 */
+    background-color: transparent; /* 设置滚动条拖动块的颜色为透明 */
 }
 
 /* 针对其他浏览器的滚动条样式设置 */
@@ -13,10 +13,13 @@
 /* 你可以根据需要选择是否使用该部分样式设置 */
 /* 或者根据具体浏览器兼容性情况进行判断和调整 */
 body {
-  scrollbar-width: thin; /* 设置滚动条宽度为thin */
-  scrollbar-color: transparent transparent; /* 设置滚动条颜色为透明 */
-  overflow: hidden;
+    scrollbar-width: thin; /* 设置滚动条宽度为thin */
+    scrollbar-color: transparent transparent; /* 设置滚动条颜色为透明 */
+    overflow: hidden;
 }
-.el-message {
-  z-index: 99999 !important;
+
+/*设置消息提示框的位置*/
+.el-message,
+.el-popover.el-popper {
+    z-index: 99999 !important;
 }

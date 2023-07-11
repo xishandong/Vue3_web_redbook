@@ -1,5 +1,6 @@
 import http from "@/utils/http";
 
+// 登录
 export const login = ({email, password}) => {
     return http({
         url: '/login/',
@@ -15,6 +16,7 @@ export const login = ({email, password}) => {
 }
 
 
+// 注册
 export const Register = ({email, username, password}) => {
     return http({
         url: '/register/',
@@ -30,6 +32,7 @@ export const Register = ({email, username, password}) => {
     })
 }
 
+// 访问用户主页
 export const queryUserIndex = ({id}) => {
     return http({
         url: '/index/',
@@ -40,6 +43,7 @@ export const queryUserIndex = ({id}) => {
     })
 }
 
+// 上传帖子
 export const uploadPost = (data) => {
     return http({
         url: '/upload/info/',
@@ -48,6 +52,7 @@ export const uploadPost = (data) => {
     })
 }
 
+// 帖子详情
 export const postDetail = ({id}) => {
     return http({
         url: '/post/detail/',
@@ -58,6 +63,7 @@ export const postDetail = ({id}) => {
     })
 }
 
+// 主页帖子
 export const queryPost = ({offset}) => {
     return http({
         url: '/post/',
@@ -66,10 +72,35 @@ export const queryPost = ({offset}) => {
     })
 }
 
+// 评论帖子
 export const doComment = ({data}) => {
     return http({
         url: '/comment/',
         method: 'POST',
         data: data
+    })
+}
+
+// 用户关注
+export const doFocus = ({id}) => {
+    return http({
+        url: '/focus/',
+        method: 'POST',
+        data: {id}
+    })
+}
+
+// 获取用户关注
+export const queryUserFocus = () => {
+    return http({
+        url: '/user/focus/',
+    })
+}
+
+export const unFollow = ({id}) => {
+    return http({
+        url: '/user/unfollow/',
+        method: 'POST',
+        data: {id}
     })
 }
