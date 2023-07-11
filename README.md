@@ -2,6 +2,9 @@
 
 ## 此仓库是前端代码
 
+## 后端代码仓库
+[后端代码仓库](https://github.com/xishandong/Django_Server_redbook)
+
 ### 使用
 
 ``` bash
