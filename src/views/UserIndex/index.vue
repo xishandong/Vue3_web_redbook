@@ -5,7 +5,10 @@ import HomeCard from "@/components/homeCard.vue";
 import CardDetail from "@/components/cardDetail.vue";
 import {Back} from "@element-plus/icons-vue";
 import {queryUserIndex, postDetail} from "@/apis/main";
+import {getCurrentTime} from "@/utils/getTime";
+import {useUserStore} from "@/stores/user";
 
+const userStore = useUserStore()
 const route = useRoute()
 const userInfo = ref({})
 const radio = ref('帖子')
@@ -38,6 +41,14 @@ const close = () => {
 onMounted(async () => {
   await getUserInfo()
 })
+const afterDoComment = (comment) => {
+  const info = [{
+    user: userStore.userInfo,
+    content: comment.content,
+    createTime: getCurrentTime()
+  }]
+  detail.value.comment = [...detail.value.comment, ...info]
+}
 </script>
 
 <template>
@@ -78,7 +89,7 @@ onMounted(async () => {
             <Back/>
           </el-icon>
         </button>
-        <card-detail :detail="detail"/>
+        <card-detail :detail="detail" @afterDoComment="afterDoComment"/>
       </div>
     </div>
     <div v-else-if="radio === '收藏'">
@@ -94,7 +105,7 @@ onMounted(async () => {
             <Back/>
           </el-icon>
         </button>
-        <card-detail :detail="detail"/>
+        <card-detail :detail="detail" @afterDoComment="afterDoComment"/>
       </div>
     </div>
     <div v-else-if="radio === '点赞'">
@@ -110,7 +121,7 @@ onMounted(async () => {
             <Back/>
           </el-icon>
         </button>
-        <card-detail :detail="detail"/>
+        <card-detail :detail="detail" @afterDoComment="afterDoComment"/>
       </div>
     </div>
   </div>
