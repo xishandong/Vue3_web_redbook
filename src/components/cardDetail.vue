@@ -63,7 +63,9 @@ const comment = async (post, to) => {
         <el-col :span="50">
           <div class="info" style="width: 500px;">
             <el-row style="align-items: center;width: 500px;">
-              <el-avatar :src="detail.user.avatar" size="large"/>
+              <a :href="`/user/index/${detail.user.id}`">
+                <el-avatar :src="detail.user.avatar" size="large"/>
+              </a>
               <div class="username">{{ detail.user.username }}</div>
               <el-popconfirm @confirm="cancelFocusOn(detail.user.id)" title="确认取消关注吗?" confirm-button-text="确认"
                              v-if="checkFollow(detail.user.id)"
@@ -92,7 +94,9 @@ const comment = async (post, to) => {
                   <div v-for="item in detail.comment" :key="item.id">
                     <el-row :gutter="20">
                       <el-col :span="2.5">
-                        <el-avatar :src="item.user.avatar" :size="30"></el-avatar>
+                        <a :href="`/user/index/${item.user.id}`">
+                          <el-avatar :src="item.user.avatar" :size="30"></el-avatar>
+                        </a>
                       </el-col>
                       <el-col :span="20" style="font-size: 14px">
                         <div style="color:#33333399;">{{ item.user.username }}</div>

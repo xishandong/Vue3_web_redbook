@@ -30,6 +30,11 @@ export const useUserStore
             userInfo.value = {}
             return {'info': '成功退出登录'}
         }
+        const changeInfo = ({username, signature, avatar}) => {
+            userInfo.value.username = username
+            userInfo.value.signature = signature
+            userInfo.value.avatar = avatar
+        }
         return {
             userInfo,
             getUserInfo,
@@ -37,7 +42,8 @@ export const useUserStore
             userRegister,
             extendUserInfo,
             userFocus,
-            removeFocus
+            removeFocus,
+            changeInfo
         }
     },
     {

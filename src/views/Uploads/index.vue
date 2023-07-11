@@ -31,11 +31,25 @@ const PostId = ref(0)
 const handlePictureCardPreview = (uploadFile) => {
   dialogImageUrl.value = uploadFile.url
   dialogVisible.value = true
+  return true
 }
-const handleRemove = (uploadFile, uploadFiles) => {
+const handleChange = (uploadFile, uploadFiles) => {
+  if (uploadFile.raw.type !== 'image/jpeg') {
+    ElMessage.error('请正确上传图片文件!')
+    upload.value.handleRemove(uploadFile)
+    return false
+  } else if (uploadFile.raw.size / 1024 / 1024 > 2) {
+    ElMessage.error('文件大小最多2MB!')
+    upload.value.handleRemove(uploadFile)
+    return false
+  }
+  return true
 }
 const upload = ref(null)
-const beforeUpload = () => {
+const headersObj = {
+  Authorization: `Bearer ${userStore.userInfo.token}`
+}
+const beforeUpload = (rawFile) => {
   Post.value = {
     id: PostId.value
   }
@@ -114,9 +128,10 @@ const MakePrev = () => {
               ref="upload"
               list-type="picture-card"
               multiple
+              :headers="headersObj"
               :limit="9"
               :on-preview="handlePictureCardPreview"
-              :on-remove="handleRemove"
+              :on-change="handleChange"
               :auto-upload="false"
               :on-exceed="handleExceed"
               :data="Post"

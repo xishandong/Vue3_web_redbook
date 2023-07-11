@@ -104,3 +104,14 @@ export const unFollow = ({id}) => {
         data: {id}
     })
 }
+
+export const updateUserInfo = ({username, signature}) => {
+    return http({
+        url: '/user/update/',
+        method: 'POST',
+        data: {
+            username,
+            signature
+        }
+    })
+}

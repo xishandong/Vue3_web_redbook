@@ -1,9 +1,11 @@
 <script setup>
 import {ref} from "vue";
-import {Promotion, Expand, Close} from "@element-plus/icons-vue";
+import {Promotion, Expand, Close, Edit, Tools, User, Lock} from "@element-plus/icons-vue";
 import {useUserStore} from "@/stores/user";
 import Login from '@/views/Login/index.vue'
 import {ElMessage} from "element-plus";
+import {genFileId} from 'element-plus'
+import {updateUserInfo} from "@/apis/main";
 // user
 const userStore = useUserStore()
 // control menu condition
@@ -15,39 +17,127 @@ const toggleMenu = () => {
 // logout
 const confirm = async () => {
   const res = await userStore.userLogout()
-  ElMessage({type:'success', message: res.info})
+  ElMessage({type: 'success', message: res.info})
 }
+// 显示登录界面
 const show = ref(false)
 const changeShow = () => {
   show.value = !show.value;
+}
+// 用户信息更新栏
+// 控制文件表单
+const dialogFormVisible = ref(false)
+// 文件上传对象
+const upload = ref(null)
+// 上传头像成功后修改pinia数据
+const avatar = ref('')
+const fileList = ref([])
+const handleExceed = (files) => {
+  upload.value.clearFiles()
+  const file = files[0]
+  file.uid = genFileId()
+  upload.value.handleStart(file)
+}
+const handleChange = (uploadFile, uploadFiles) => {
+  if (uploadFile.raw.type !== 'image/jpeg') {
+    ElMessage.error('请正确上传图片文件!')
+    upload.value.handleRemove(uploadFile)
+    return false
+  } else if (uploadFile.raw.size / 1024 / 1024 > 2) {
+    ElMessage.error('文件大小最多2MB!')
+    upload.value.handleRemove(uploadFile)
+    return false
+  }
+  return true
+}
+const onSuccess = async (response) => {
+  avatar.value = response.info.filepath
+}
+// 控制表单信息
+const form = ref({
+  username: userStore.userInfo.username,
+  signature: userStore.userInfo.signature
+})
+// 表单验证规则
+const rules = {
+  username: [
+    {required: true, message: '用户名不能为空！', trigger: 'blur'}
+  ],
+  signature: [
+    {required: true, message: '个性签名不能为空!', trigger: 'blur'}
+  ]
+}
+// 表单对象
+const formRef = ref(null)
+const doUpdate = async () => {
+  const {username, signature} = form.value
+  if (username === userStore.userInfo.username && signature === userStore.userInfo.signature && fileList.value.length === 0) {
+    ElMessage({type: 'warning', message: '未作任何修改！'})
+  } else if (username === userStore.userInfo.username && signature === userStore.userInfo.signature && fileList.value.length === 1) {
+    await upload.value.submit()
+    userStore.changeInfo({username, signature, avatar})
+    ElMessage({type: 'success', message: '头像上传成功'})
+    dialogFormVisible.value = false
+  } else if (username !== userStore.userInfo.username || signature !== userStore.userInfo.signature && fileList.value.length === 0) {
+    const res = await updateUserInfo({username, signature})
+    avatar.value = userStore.userInfo.avatar
+    userStore.changeInfo({username, signature, avatar})
+    ElMessage({type: 'success', message: res.info})
+    dialogFormVisible.value = false
+  } else {
+    const res = await updateUserInfo({username, signature})
+    await upload.value.submit()
+    userStore.changeInfo({username, signature, avatar})
+    ElMessage({type: 'success', message: res.info})
+    dialogFormVisible.value = false
+  }
+}
+const headersObj = {
+  Authorization: `Bearer ${userStore.userInfo.token}`
 }
 </script>
 
 <template>
   <nav class="menu" :class="{ open: isMenuOpen }">
-    <div class="actionsBar">
-      <div>
-        <button id="menuBtn" type="button" @click="toggleMenu"><i class="iconfont icon-hanbaocaidan"></i></button>
-        <h3 class="menuText" :class="{ open2: isMenuOpen }">{{ userStore.userInfo.username }}</h3>
+    <el-tooltip effect="dark" content="切换菜单样式" placement="right">
+      <div class="actionsBar">
+        <div>
+          <button id="menuBtn" type="button" @click="toggleMenu"><i class="iconfont icon-hanbaocaidan"></i></button>
+          <h3 class="menuText" :class="{ open2: isMenuOpen }">{{ userStore.userInfo.username }}</h3>
+        </div>
       </div>
-    </div>
+    </el-tooltip>
     <ul class="optionsBar">
       <li class="menuItem">
-        <RouterLink to="/" class="menuOption">
-          <i class="iconfont icon-shouye"></i>
-          <h5 class="menuText" :class="{ open2: isMenuOpen }">主页</h5>
-        </RouterLink>
+        <el-tooltip effect="dark" content="主页" placement="right">
+          <RouterLink to="/" class="menuOption">
+            <i class="iconfont icon-shouye"></i>
+            <h5 class="menuText" :class="{ open2: isMenuOpen }">主页</h5>
+          </RouterLink>
+        </el-tooltip>
       </li>
       <li class="menuBreak">
         <hr>
       </li>
       <li class="menuItem">
-        <RouterLink to="/user/uploads" class="menuOption">
-          <el-icon size="x-large">
-            <Promotion/>
-          </el-icon>
-          <h5 class="menuText" :class="{ open2: isMenuOpen }">发布</h5>
-        </RouterLink>
+        <el-tooltip effect="dark" content="发布" placement="right">
+          <RouterLink to="/user/uploads" class="menuOption">
+            <el-icon size="x-large">
+              <Promotion/>
+            </el-icon>
+            <h5 class="menuText" :class="{ open2: isMenuOpen }">发布</h5>
+          </RouterLink>
+        </el-tooltip>
+      </li>
+      <li class="menuItem">
+        <el-tooltip effect="dark" content="更新个人信息" placement="right">
+          <div class="menuOption" @click="dialogFormVisible = true">
+            <el-icon size="x-large">
+              <Tools/>
+            </el-icon>
+            <h5 class="menuText" :class="{ open2: isMenuOpen }">更新个人信息</h5>
+          </div>
+        </el-tooltip>
       </li>
     </ul>
     <div class="about" id="about">
@@ -58,23 +148,27 @@ const changeShow = () => {
           <div>
             <img :src="userStore.userInfo.avatar" alt="">
           </div>
-          <h5 class="Username menuText" :class="{ open2: isMenuOpen }" v-show="isMenuOpen">{{ userStore.userInfo.username }}</h5>
+          <h5 class="Username menuText" :class="{ open2: isMenuOpen }" v-show="isMenuOpen">
+            {{ userStore.userInfo.username }}</h5>
           <p class="menuText" :class="{ open2: isMenuOpen }"><i class="iconfont icon-youjiantou"></i></p>
         </RouterLink>
       </div>
       <div class="themeBar">
-        <div>
-          <el-popconfirm @confirm="confirm" title="确认退出吗?" confirm-button-text="确认"
-                         cancel-button-text="取消">
-            <template #reference>
-              <button type="button" @click=""><i class="iconfont icon-tuichu"></i></button>
-            </template>
-          </el-popconfirm>
-        </div>
+        <el-tooltip effect="dark" content="退出登录" placement="right">
+          <div>
+            <el-popconfirm @confirm="confirm" title="确认退出吗?" confirm-button-text="确认"
+                           cancel-button-text="取消">
+              <template #reference>
+                <button type="button" @click=""><i class="iconfont icon-tuichu"></i></button>
+              </template>
+            </el-popconfirm>
+          </div>
+        </el-tooltip>
       </div>
     </div>
     <div v-else>
-      <div class="themeBar">
+      <el-tooltip effect="dark" content="登录" placement="right">
+        <div class="themeBar">
           <div>
             <button title="登录" type="button" @click="changeShow">
               <el-icon size="x-large">
@@ -82,16 +176,77 @@ const changeShow = () => {
               </el-icon>
             </button>
           </div>
-      </div>
+        </div>
+      </el-tooltip>
     </div>
   </nav>
   <div class="overlay" v-if="show">
-    <el-button class="close" @click="changeShow" plain round><el-icon size="x-large"><Close /></el-icon></el-button>
+    <el-button class="close" @click="changeShow" plain round>
+      <el-icon size="x-large">
+        <Close/>
+      </el-icon>
+    </el-button>
     <login @changeShow="changeShow"/>
   </div>
+
+  <el-dialog v-model="dialogFormVisible" title="更新个人信息" center draggable>
+    <div class="fileUpload">
+      <el-upload v-model:file-list="fileList"
+                 ref="upload"
+                 action="http://localhost:8000/user/avatar/"
+                 :limit="1"
+                 :on-exceed="handleExceed"
+                 :auto-upload="false"
+                 :on-change="handleChange"
+                 :headers="headersObj"
+                 :on-success="onSuccess"
+      >
+        <template #trigger>
+          <el-button class="btn" type="primary" round>选择一个文件</el-button>
+        </template>
+        <template #tip>
+          <div class="el-upload__tip" style="color:red;text-align: left">
+            仅限一个文件，新文件将会被覆盖
+          </div>
+        </template>
+      </el-upload>
+
+    </div>
+    <div class="fileUpload">
+      <el-form :model="form" ref="formRef" :rules="rules" label-position="top">
+        <el-form-item prop="username" label="昵称" label-width="100px" style="margin: 30px;">
+          <el-input v-model="form.username" maxlength="6"
+                    show-word-limit/>
+        </el-form-item>
+        <el-form-item prop="signature" label="个性签名" label-width="100px" style="margin: 30px;">
+          <el-input v-model="form.signature"/>
+        </el-form-item>
+      </el-form>
+    </div>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="dialogFormVisible = false" round>取消</el-button>
+        <el-button type="primary" @click="doUpdate" round>
+          确认
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <style scoped>
+.fileUpload {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.fileUpload button {
+  margin-left: 20px;
+  margin-bottom: 20px;
+}
+
 .overlay {
   position: fixed;
   top: 0;
@@ -101,7 +256,8 @@ const changeShow = () => {
   background-color: rgba(0, 0, 0, 0.5); /* 设置透明度的背景色 */
   z-index: 9999; /* 设置一个较大的z-index值，确保图层位于其他内容之上 */
 }
-.close{
+
+.close {
   border: 0;
   position: absolute;
   left: 71%;
@@ -109,6 +265,7 @@ const changeShow = () => {
   background-color: #fff;
   z-index: 1000; /* 设置一个较大的z-index值，确保图层位于其他内容之上 */
 }
+
 * {
   margin: 0;
   padding: 0;
@@ -391,8 +548,19 @@ const changeShow = () => {
   color: #F19FA3;
 }
 
-.selected {
-  background-color: #d5d0d0;
-  color: #f5131e;
+.el-button--text {
+  margin-right: 15px;
+}
+
+.el-select {
+  width: 300px;
+}
+
+.el-input {
+  width: 300px;
+}
+
+.dialog-footer button:first-child {
+  margin-right: 10px;
 }
 </style>
