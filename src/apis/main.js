@@ -66,4 +66,10 @@ export const queryPost = ({offset}) => {
     })
 }
 
-
+export const doComment = ({data}) => {
+    return http({
+        url: '/comment/',
+        method: 'POST',
+        data: data
+    })
+}

@@ -1,19 +1,31 @@
 <script setup>
 import {Edit} from "@element-plus/icons-vue";
 import {ref} from "vue";
+import {doComment} from "@/apis/main";
+import {ElMessage} from "element-plus";
 
 defineProps({
   detail: {
     type: Object,
   }
 })
+// 子传父
+const emit = defineEmits(['afterDoComment'])
 const content = ref('')
 const doFocusOn = (id) => {
   console.log(id)
 }
 
-const comment = (id) => {
-  console.log(id, content.value)
+const comment = async (post, to) => {
+  const data = {
+    post_id: post.id,
+    content: content.value,
+    parent_comment_id: to
+  }
+  const res = await doComment({data})
+  content.value = ''
+  ElMessage({type: 'success', message: res.info})
+  emit('afterDoComment', data)
 }
 
 </script>
@@ -67,7 +79,6 @@ const comment = (id) => {
                       </el-col>
                     </el-row>
                     <el-divider/>
-
                   </div>
                 </div>
               </div>
@@ -75,7 +86,7 @@ const comment = (id) => {
           </div>
           <el-input
               v-model="content" class="comment-input" type="text" placeholder="说点什么..."
-              :prefix-icon="Edit" @keyup.enter="comment(detail.user.id)" clearable
+              :prefix-icon="Edit" @keyup.enter="comment(detail)" clearable
           />
         </el-col>
       </el-row>

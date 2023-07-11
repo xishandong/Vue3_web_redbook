@@ -3,7 +3,11 @@ import { onMounted, ref } from "vue";
 import HomeCard from "@/components/homeCard.vue";
 import { Back } from "@element-plus/icons-vue";
 import CardDetail from "@/components/cardDetail.vue";
-import { postDetail, queryPost } from "@/apis/main";
+import {postDetail, queryPost} from "@/apis/main";
+import {useUserStore} from "@/stores/user";
+import {getCurrentTime} from "@/utils/getTime";
+
+const userStore = useUserStore()
 
 // 主页卡片
 const cards = ref([]);
@@ -54,6 +58,15 @@ const overlayY = ref(0); // 覆盖层的垂直位置
 onMounted(async () => {
   await doQuery(0);
 });
+// 评论发送后展示在页面上
+const afterDoComment = (comment) => {
+  const info = [{
+    user: userStore.userInfo,
+    content: comment.content,
+    createTime: getCurrentTime()
+  }]
+  detail.value.comment = [...detail.value.comment, ...info]
+}
 </script>
 
 <template>
@@ -67,7 +80,7 @@ onMounted(async () => {
           <Back/>
         </el-icon>
       </button>
-      <card-detail :detail="detail"/>
+      <card-detail :detail="detail" @afterDoComment="afterDoComment"/>
     </div>
   </transition>
 </template>
