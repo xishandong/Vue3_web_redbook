@@ -69,9 +69,14 @@ const onError = async (error) => {
 }
 // 控制表单信息
 const form = ref({
-  username: userStore.userInfo.username,
-  signature: userStore.userInfo.signature
+  username: '',
+  signature: ''
 })
+const openDialog = () => {
+  dialogFormVisible.value = true
+  form.value.username = userStore.userInfo.username
+  form.value.signature = userStore.userInfo.signature
+}
 // 表单验证规则
 const rules = {
   username: [
@@ -118,10 +123,6 @@ const doUpdate = async () => {
     dialogFormVisible.value = false;
   }
 };
-
-const headersObj = {
-  Authorization: `Bearer ${userStore.userInfo.token}`
-}
 </script>
 
 <template>
@@ -158,7 +159,7 @@ const headersObj = {
       </li>
       <li class="menuItem" v-if="userStore.userInfo.id">
         <el-tooltip effect="dark" content="更新个人信息" placement="right">
-          <div class="menuOption" @click="dialogFormVisible = true">
+          <div class="menuOption" @click="openDialog">
             <el-icon size="x-large">
               <Tools/>
             </el-icon>
@@ -225,7 +226,7 @@ const headersObj = {
                  :on-exceed="handleExceed"
                  :auto-upload="false"
                  :on-change="handleChange"
-                 :headers="headersObj"
+                 :headers="userStore.headersObj"
                  :on-success="onSuccess"
                  :on-error="onError"
       >

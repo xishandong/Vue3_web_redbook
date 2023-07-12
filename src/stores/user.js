@@ -7,18 +7,18 @@ export const useUserStore = defineStore('user', () => {
     const userFocus = ref([]);
     const userCollect = ref([]);
     const userFavorite = ref([]);
-
+    const headersObj = ref({})
     const userRegister = async ({email, username, password}) => {
         await Register({email, username, password});
     };
 
     const getUserInfo = async ({email, password}) => {
         userInfo.value = await login({email, password});
-
         const focusResult = await queryUserFocus();
         userFocus.value = focusResult.info.follow;
         userCollect.value = focusResult.info.collected;
         userFavorite.value = focusResult.info.favorites;
+        headersObj.value = {Authorization: `Bearer ${userInfo.value.token}`}
     };
 
     const extendUserInfo = (type, id) => {
@@ -71,7 +71,8 @@ export const useUserStore = defineStore('user', () => {
         removeFocus,
         changeInfo,
         userCollect,
-        userFavorite
+        userFavorite,
+        headersObj
     };
 }, {
     persist: true,

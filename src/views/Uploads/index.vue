@@ -59,9 +59,6 @@ const handleChange = (uploadFile, uploadFiles) => {
   return true;
 }
 const upload = ref(null)
-const headersObj = {
-  Authorization: `Bearer ${userStore.userInfo.token}`
-}
 const beforeUpload = (rawFile) => {
   Post.value = {
     id: PostId.value
@@ -142,7 +139,7 @@ const MakePrev = () => {
               ref="upload"
               list-type="picture-card"
               multiple
-              :headers="headersObj"
+              :headers="userStore.headersObj"
               :limit="9"
               :on-preview="handlePictureCardPreview"
               :on-change="handleChange"
