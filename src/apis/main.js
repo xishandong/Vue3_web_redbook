@@ -115,3 +115,15 @@ export const updateUserInfo = ({username, signature}) => {
         }
     })
 }
+
+export const queryUserPost = ({user_id, types, offset}) => {
+    return http({
+        url: '/user/post/',
+        method: 'POST',
+        data: {
+            user_id,
+            types,
+            offset
+        }
+    })
+}

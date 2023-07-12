@@ -88,8 +88,11 @@ const doUploads = async () => {
   const res = await uploadPost(data)
   PostId.value = res.info
   upload.value.submit()
-  ElMessage.info({type: 'success', message: '发布成功，跳转到主页'})
-  await router.replace('/')
+  ElMessage({type: 'success', message: '发布成功，3秒后跳转到主页'})
+  setTimeout(() => {
+    router.replace('/')
+  }, 3000)
+
 }
 const handleExceed = () => {
   ElMessage.warning(
