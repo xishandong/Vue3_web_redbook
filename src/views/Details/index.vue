@@ -1,37 +1,24 @@
 <script setup>
-import {onMounted, ref} from "vue";
+import {onMounted} from "vue";
 import {useRoute} from "vue-router";
 import CardDetail from "@/components/cardDetail.vue";
-import {postDetail} from "@/apis/main";
-import {getCurrentTime} from "@/utils/getTime";
-import {useUserStore} from "@/stores/user";
+import {controlDetail} from "@/utils/controlDetail";
 
-const route = useRoute()
-const detail = ref({});
-
+const route = useRoute();
+const Detail = controlDetail();
+const detail = Detail.detail
+const comments = Detail.comments
 // 评论内容
-const content = ref('')
-const userStore = useUserStore()
-const getDetail = async () => {
-  const id = route.params.id
-  const res = await postDetail({ id });
-  detail.value = res.info
-}
+const content = Detail.content
+const getDetail = () => Detail.getDetail(route.params.id)
 
-const afterDoComment = (comment) => {
-  const info = [{
-    user: userStore.userInfo,
-    content: comment.content,
-    createTime: getCurrentTime()
-  }]
-  detail.value.comment = [...detail.value.comment, ...info]
-}
+const afterDoComment = (comment) => Detail.afterDoComment(comment)
 
 onMounted(() => getDetail())
 </script>
 
 <template>
-  <card-detail :detail="detail" @afterDoComment="afterDoComment" v-if="detail.id"/>
+  <card-detail :detail="detail" :comments="comments" @afterDoComment="afterDoComment" v-if="detail.id"/>
 </template>
 
 <style scoped>

@@ -1,33 +1,29 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import {onMounted, ref} from "vue";
 import HomeCard from "@/components/homeCard.vue";
-import { Back } from "@element-plus/icons-vue";
+import {Back} from "@element-plus/icons-vue";
 import CardDetail from "@/components/cardDetail.vue";
-import {postDetail, queryPost} from "@/apis/main";
-import {useUserStore} from "@/stores/user";
-import {getCurrentTime} from "@/utils/getTime";
+import {queryPost} from "@/apis/main";
 import {useRoute} from "vue-router";
+import {controlDetail} from "@/utils/controlDetail";
 
-const userStore = useUserStore()
 const query = useRoute().query.query
+const Details = controlDetail()
 
-// 主页卡片
+// 主页卡片 //////////////////////////////////////////////////////////////////
 const cards = ref([]);
-const detail = ref({});
 const disabled = ref(true); // 初始禁用滚动加载
-
 // 主页获取帖子
 const doQuery = async (offset) => {
-  const res = await queryPost({ offset, query });
+  const res = await queryPost({offset, query});
   cards.value = res.info;
   disabled.value = false; // 启用滚动加载
 };
-
 // 无限滚动
 const load = async () => {
   disabled.value = true;
   const offset = cards.value.length;
-  const res = await queryPost({ offset, query });
+  const res = await queryPost({offset, query});
   const more = res.info;
   if (more.length === 0) {
     disabled.value = true; // 没有更多数据，禁用滚动加载
@@ -36,39 +32,33 @@ const load = async () => {
     disabled.value = false;
   }
 };
+// 主页卡片结束////////////////////////////////////////////////////////////////
 
-// 卡片详情
+// 卡片详情 //////////////////////////////////////////////////////////////////
+const detail = Details.detail;
 const show = ref(false);
-const getDetails = async (id) => {
-  const res = await postDetail({ id });
-  return res.info;
-};
+const overlayX = ref(0); // 覆盖层的水平位置
+const overlayY = ref(0); // 覆盖层的垂直位置
+const comments = Details.comments // 评论发送后展示在页面上
+const content = Details.content // 评论内容
+const getDetails = async (id) => Details.getDetail(id)
 const showMessage = async (id) => {
   window.history.pushState({}, "", `/explore/${id}`);
   overlayX.value = event.clientX;
   overlayY.value = event.clientY;
-  detail.value = await getDetails(id);
+  await getDetails(id);
   show.value = true;
 };
+const afterDoComment = (comment) => Details.afterDoComment(comment)
 const close = () => {
   window.history.pushState({}, "", "/");
   show.value = false;
 };
-const overlayX = ref(0); // 覆盖层的水平位置
-const overlayY = ref(0); // 覆盖层的垂直位置
+// 卡片详情结束 //////////////////////////////////////////////////////////////////
 
 onMounted(async () => {
   await doQuery(0);
 });
-// 评论发送后展示在页面上
-const afterDoComment = (comment) => {
-  const info = [{
-    user: userStore.userInfo,
-    content: comment.content,
-    createTime: getCurrentTime()
-  }]
-  detail.value.comment = [...detail.value.comment, ...info]
-}
 </script>
 
 <template>
@@ -82,7 +72,7 @@ const afterDoComment = (comment) => {
           <Back/>
         </el-icon>
       </button>
-      <card-detail :detail="detail" @afterDoComment="afterDoComment"/>
+      <card-detail :detail="detail" :comments="comments" @afterDoComment="afterDoComment"/>
     </div>
   </transition>
 </template>

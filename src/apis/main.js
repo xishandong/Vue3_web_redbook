@@ -127,3 +127,15 @@ export const queryUserPost = ({user_id, types, offset}) => {
         }
     })
 }
+
+export const controlUserCollectOrLike = ({post_id, operator, type}) => {
+    return http({
+        url: '/post/control/',
+        method: 'POST',
+        data: {
+            post_id,
+            type,
+            operator
+        }
+    })
+}

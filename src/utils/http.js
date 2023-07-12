@@ -34,6 +34,13 @@ http.interceptors.response.use(res => res.data, e => {
     if(e.response.status === 404){
         router.replace('/NotFound')
     }
+    if(e.response.status === 403){
+        ElMessage({
+            type: 'warning',
+            message: e.response.data.error
+        })
+        router.replace('/login')
+    }
     return Promise.reject(e)
 })
 

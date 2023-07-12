@@ -4,30 +4,27 @@ import {onMounted, ref} from "vue";
 import HomeCard from "@/components/homeCard.vue";
 import CardDetail from "@/components/cardDetail.vue";
 import {Back} from "@element-plus/icons-vue";
-import {queryUserIndex, postDetail, queryUserPost, queryPost} from "@/apis/main";
-import {getCurrentTime} from "@/utils/getTime";
-import {useUserStore} from "@/stores/user";
+import {queryUserIndex, queryUserPost} from "@/apis/main";
+import {controlDetail} from "@/utils/controlDetail";
 
-const userStore = useUserStore()
 const route = useRoute()
+const Details = controlDetail()
 
+// 加载用户信息 //////////////////////////////////////////////////////////////
 const userInfo = ref({})
-const radio = ref('帖子')
-const userPost = ref([])
-const userCollect = ref([])
-const userFavorite = ref([])
-
-const overlayX = ref(0); // 覆盖层的水平位置
-const overlayY = ref(0); // 覆盖层的垂直位置
-
-const disabled = ref(true); // 初始禁用滚动加载
-
 const getUserInfo = async () => {
   const id = route.params.id
   const res = await queryUserIndex({id})
   userInfo.value = res.data
 }
+// 加载用户信息结束 ////////////////////////////////////////////////////////////
 
+// 主页切换标签 //////////////////////////////////////////////////////////////
+const radio = ref('帖子')
+const userPost = ref([])
+const userCollect = ref([])
+const userFavorite = ref([])
+const disabled = ref(true); // 初始禁用滚动加载
 const Toggle = async () => {
   const user_id = route.params.id
   const offset = 0
@@ -38,77 +35,74 @@ const Toggle = async () => {
   } else if (radio.value === '收藏' && userCollect.value.length === 0) {
     const post = await queryUserPost({user_id, types, offset})
     userCollect.value = post.info
-  } else if (radio.value === '喜欢' && userFavorite.value.length === 0) {
+  } else if (radio.value === '点赞' && userFavorite.value.length === 0) {
     const post = await queryUserPost({user_id, types, offset})
     userFavorite.value = post.info
   }
+  disabled.value = false;
 }
-
 const load = async () => {
   disabled.value = true;
-  const user_id = route.params.id;
+  const user_id = userInfo.value.user.id;
   const types = radio.value;
-  const offset = userPost.value.length;
   if (types === '帖子') {
+    const offset = userPost.value.length;
     const post = await queryUserPost({user_id, types, offset});
     if (post.length === 0) {
-      disabled.value = true; // 没有更多数据，禁用滚动加载
+      disabled.value = true;
     } else {
       userPost.value = [...userPost.value, ...post.info];
       disabled.value = false;
     }
-  } else if (types === '喜欢') {
+  } else if (types === '点赞') {
+    const offset = userFavorite.value.length;
     const like = await queryUserPost({user_id, types, offset});
     if (like.length === 0) {
-      disabled.value = true; // 没有更多数据，禁用滚动加载
+      disabled.value = true;
     } else {
       userFavorite.value = [...userFavorite.value, ...like.info];
       disabled.value = false;
     }
   } else if (types === '收藏') {
+    const offset = userCollect.value.length;
     const collect = await queryUserPost({user_id, types, offset});
     if (collect.length === 0) {
-      disabled.value = true; // 没有更多数据，禁用滚动加载
+      disabled.value = true;
     } else {
       userCollect.value = [...userCollect.value, ...collect.info];
       disabled.value = false;
     }
   }
 };
+// 主页切换标签结束 ///////////////////////////////////////////////////////////
 
-
-const detail = ref({})
+// 卡片详情页的内容 //////////////////////////////////////////////////////////
+const detail = Details.detail
+const comments = Details.comments
+const overlayX = ref(0); // 覆盖层的水平位置
+const overlayY = ref(0); // 覆盖层的垂直位置
 // 卡片详情
 const show = ref(false)
-const getDetails = async (id) => {
-  const res = await postDetail({id})
-  return res.info
-}
+const getDetails = async (id) => Details.getDetail(id)
 const showMessage = async (id) => {
   window.history.pushState({}, '', `/explore/${id}`);
   overlayX.value = event.clientX;
   overlayY.value = event.clientY;
-  detail.value = await getDetails(id)
+  await getDetails(id)
   show.value = true
 }
+const afterDoComment = (comment) => Details.afterDoComment(comment)
 const close = () => {
-  window.history.pushState({}, '', `/`);
+  window.history.pushState({}, '', `/user/index/${userInfo.value.user.id}`);
   show.value = false
 }
+// 卡片详情页的内容结束 //////////////////////////////////////////////////////////
 
 onMounted(async () => {
   await getUserInfo()
   await Toggle()
-  disabled.value = false; // 启用滚动加载
 })
-const afterDoComment = (comment) => {
-  const info = [{
-    user: userStore.userInfo,
-    content: comment.content,
-    createTime: getCurrentTime()
-  }]
-  detail.value.comment = [...detail.value.comment, ...info]
-}
+
 </script>
 
 <template>
@@ -140,7 +134,8 @@ const afterDoComment = (comment) => {
       <div v-if="userPost.length === 0">
         <el-empty description="现在还没有帖子..."/>
       </div>
-      <div class="container" v-infinite-scroll="load" :infinite-scroll-disabled="disabled" v-else>
+      <div class="container" v-infinite-scroll="load" :infinite-scroll-disabled="disabled" infinite-scroll-distance="0"
+           v-else>
         <home-card :cards="userPost" @show-detail="showMessage"></home-card>
       </div>
       <transition name="fade">
@@ -150,7 +145,7 @@ const afterDoComment = (comment) => {
               <Back/>
             </el-icon>
           </button>
-          <card-detail :detail="detail" @afterDoComment="afterDoComment"/>
+          <card-detail :detail="detail" :comments="comments" @afterDoComment="afterDoComment" v-if="detail.id"/>
         </div>
       </transition>
     </div>
@@ -158,7 +153,8 @@ const afterDoComment = (comment) => {
       <div v-if="userCollect.length === 0">
         <el-empty description="现在还没有收藏..."/>
       </div>
-      <div class="container" v-infinite-scroll="load" :infinite-scroll-disabled="disabled" v-else>
+      <div class="container" v-infinite-scroll="load" :infinite-scroll-disabled="disabled" infinite-scroll-distance="0"
+           v-else>
         <home-card :cards="userCollect" @show-detail="showMessage"></home-card>
       </div>
       <transition name="fade">
@@ -176,7 +172,8 @@ const afterDoComment = (comment) => {
       <div v-if="userFavorite.length === 0">
         <el-empty description="现在还没有点赞..."/>
       </div>
-      <div class="container" v-infinite-scroll="load" :infinite-scroll-disabled="disabled" v-else>
+      <div class="container" v-infinite-scroll="load" :infinite-scroll-disabled="disabled" infinite-scroll-distance="0"
+           v-else>
         <home-card :cards="userFavorite" @show-detail="showMessage"></home-card>
       </div>
       <transition name="fade">
