@@ -33,17 +33,30 @@ const handlePictureCardPreview = (uploadFile) => {
   dialogVisible.value = true
   return true
 }
+const onError = async (error) => {
+  ElMessage({
+    type: 'warning',
+    message: '图片上传失败'
+  })
+  const userStore = useUserStore();
+  await userStore.userLogout()
+  await router.replace('/')
+}
 const handleChange = (uploadFile, uploadFiles) => {
-  if (uploadFile.raw.type !== 'image/jpeg') {
-    ElMessage.error('请正确上传图片文件!')
-    upload.value.handleRemove(uploadFile)
-    return false
-  } else if (uploadFile.raw.size / 1024 / 1024 > 2) {
-    ElMessage.error('文件大小最多2MB!')
-    upload.value.handleRemove(uploadFile)
-    return false
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif']; // 可接受的图片类型
+  const maxSize = 2; // 最大文件大小，单位：MB
+
+  if (!allowedTypes.includes(uploadFile.raw.type)) {
+    ElMessage.error('请上传正确的图片文件!');
+    upload.value.handleRemove(uploadFile);
+    return false;
+  } else if (uploadFile.raw.size / 1024 / 1024 > maxSize) {
+    ElMessage.error(`文件大小最多${maxSize}MB!`);
+    upload.value.handleRemove(uploadFile);
+    return false;
   }
-  return true
+
+  return true;
 }
 const upload = ref(null)
 const headersObj = {
@@ -78,18 +91,16 @@ const doUploads = async () => {
   ElMessage.info({type: 'success', message: '发布成功，跳转到主页'})
   await router.replace('/')
 }
-
 const handleExceed = () => {
   ElMessage.warning(
       '最多可以添加9张图片哦!'
   )
 }
-
+// 制作预览页面
 const show = ref(false)
 const close = () => {
   show.value = false
 }
-
 const MakePrev = () => {
   if (fileListUrl.value.length === 0) {
     ElMessage.warning(
@@ -136,6 +147,7 @@ const MakePrev = () => {
               :on-exceed="handleExceed"
               :data="Post"
               :before-upload="beforeUpload"
+              :on-error="onError"
           >
             <el-icon>
               <Plus/>

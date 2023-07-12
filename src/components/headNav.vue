@@ -1,12 +1,14 @@
 <script setup>
 import {ref} from "vue";
 import {Search} from '@element-plus/icons-vue'
+import {useRouter} from "vue-router";
 
+const router = useRouter()
 // searchValue
 const searchInput = ref('')
 // search
 const searchThings = () => {
-  console.log('search', searchInput.value)
+  router.replace(`/?query=${searchInput.value}`)
 }
 
 </script>

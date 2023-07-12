@@ -6,15 +6,15 @@ import Login from '@/views/Login/index.vue'
 import {ElMessage} from "element-plus";
 import {genFileId} from 'element-plus'
 import {updateUserInfo} from "@/apis/main";
-// user
+import router from "@/router";
+
 const userStore = useUserStore()
-// control menu condition
+// 控制菜单样式
 const isMenuOpen = ref(false)
-// change menu
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
 }
-// logout
+// 登出
 const confirm = async () => {
   const res = await userStore.userLogout()
   ElMessage({type: 'success', message: res.info})
@@ -25,6 +25,7 @@ const changeShow = () => {
   show.value = !show.value;
 }
 // 用户信息更新栏
+////////////////////////////////////////////////////////////////
 // 控制文件表单
 const dialogFormVisible = ref(false)
 // 文件上传对象
@@ -39,19 +40,32 @@ const handleExceed = (files) => {
   upload.value.handleStart(file)
 }
 const handleChange = (uploadFile, uploadFiles) => {
-  if (uploadFile.raw.type !== 'image/jpeg') {
-    ElMessage.error('请正确上传图片文件!')
-    upload.value.handleRemove(uploadFile)
-    return false
-  } else if (uploadFile.raw.size / 1024 / 1024 > 2) {
-    ElMessage.error('文件大小最多2MB!')
-    upload.value.handleRemove(uploadFile)
-    return false
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif']; // 可接受的图片类型
+  const maxSize = 2; // 最大文件大小，单位：MB
+
+  if (!allowedTypes.includes(uploadFile.raw.type)) {
+    ElMessage.error('请上传正确的图片文件!');
+    upload.value.handleRemove(uploadFile);
+    return false;
+  } else if (uploadFile.raw.size / 1024 / 1024 > maxSize) {
+    ElMessage.error(`文件大小最多${maxSize}MB!`);
+    upload.value.handleRemove(uploadFile);
+    return false;
   }
-  return true
-}
+
+  return true;
+};
 const onSuccess = async (response) => {
   avatar.value = response.info.filepath
+}
+const onError = async (error) => {
+  ElMessage({
+    type: 'warning',
+    message: '头像上传失败'
+  })
+  const userStore = useUserStore();
+  await userStore.userLogout()
+  await router.replace('/')
 }
 // 控制表单信息
 const form = ref({
@@ -70,28 +84,41 @@ const rules = {
 // 表单对象
 const formRef = ref(null)
 const doUpdate = async () => {
-  const {username, signature} = form.value
-  if (username === userStore.userInfo.username && signature === userStore.userInfo.signature && fileList.value.length === 0) {
-    ElMessage({type: 'warning', message: '未作任何修改！'})
-  } else if (username === userStore.userInfo.username && signature === userStore.userInfo.signature && fileList.value.length === 1) {
-    await upload.value.submit()
-    userStore.changeInfo({username, signature, avatar})
-    ElMessage({type: 'success', message: '头像上传成功'})
-    dialogFormVisible.value = false
-  } else if (username !== userStore.userInfo.username || signature !== userStore.userInfo.signature && fileList.value.length === 0) {
-    const res = await updateUserInfo({username, signature})
-    avatar.value = userStore.userInfo.avatar
-    userStore.changeInfo({username, signature, avatar})
-    ElMessage({type: 'success', message: res.info})
-    dialogFormVisible.value = false
-  } else {
-    const res = await updateUserInfo({username, signature})
-    await upload.value.submit()
-    userStore.changeInfo({username, signature, avatar})
-    ElMessage({type: 'success', message: res.info})
-    dialogFormVisible.value = false
+  const {username, signature} = form.value;
+  const isModified = username !== userStore.userInfo.username || signature !== userStore.userInfo.signature;
+  const isAvatarUploaded = fileList.value.length === 1;
+
+  if (!isModified && !isAvatarUploaded) {
+    ElMessage({type: 'warning', message: '未作任何修改！'});
+    return;
   }
-}
+
+  if (isModified && !isAvatarUploaded) {
+    await updateUserInfo({username, signature});
+    avatar.value = userStore.userInfo.avatar;
+    userStore.changeInfo({username, signature, avatar});
+    ElMessage({type: 'success', message: '用户信息更新成功'});
+    dialogFormVisible.value = false;
+    return;
+  }
+
+  if (!isModified && isAvatarUploaded) {
+    await upload.value.submit();
+    userStore.changeInfo({username, signature, avatar});
+    ElMessage({type: 'success', message: '头像上传成功'});
+    dialogFormVisible.value = false;
+    return;
+  }
+
+  if (isModified && isAvatarUploaded) {
+    const res = await updateUserInfo({username, signature});
+    await upload.value.submit();
+    userStore.changeInfo({username, signature, avatar});
+    ElMessage({type: 'success', message: res.info});
+    dialogFormVisible.value = false;
+  }
+};
+
 const headersObj = {
   Authorization: `Bearer ${userStore.userInfo.token}`
 }
@@ -129,7 +156,7 @@ const headersObj = {
           </RouterLink>
         </el-tooltip>
       </li>
-      <li class="menuItem">
+      <li class="menuItem" v-if="userStore.userInfo.id">
         <el-tooltip effect="dark" content="更新个人信息" placement="right">
           <div class="menuOption" @click="dialogFormVisible = true">
             <el-icon size="x-large">
@@ -200,6 +227,7 @@ const headersObj = {
                  :on-change="handleChange"
                  :headers="headersObj"
                  :on-success="onSuccess"
+                 :on-error="onError"
       >
         <template #trigger>
           <el-button class="btn" type="primary" round>选择一个文件</el-button>

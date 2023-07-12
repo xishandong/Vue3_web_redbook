@@ -1,10 +1,9 @@
 // axios基础配置
 import axios from "axios";
 import {useUserStore} from "@/stores/user";
-import {useRouter} from "vue-router";
-import {ElMessage} from "element-plus";
+import router from '@/router'
+import { ElMessage } from 'element-plus'
 
-const router = useRouter()
 
 const http = axios.create({
     baseURL: 'http://localhost:8000',
@@ -25,12 +24,15 @@ http.interceptors.request.use(config => {
 http.interceptors.response.use(res => res.data, e => {
     if (e.response.status === 401) {
         ElMessage({
-        type: 'warning',
-        message: e.response.data.error
-    })
+            type: 'warning',
+            message: e.response.data.error
+        })
         const userStore = useUserStore();
         userStore.userLogout()
         router.replace('/')
+    }
+    if(e.response.status === 404){
+        router.replace('/NotFound')
     }
     return Promise.reject(e)
 })

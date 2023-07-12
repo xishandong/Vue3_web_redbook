@@ -119,7 +119,7 @@ const doLogin = () => {
       // 提示用户
       await userStore.getUserInfo({email, password})
       emit('changeShow')
-      await router.replace('/')
+      await router.replace(`/user/index/${userStore.userInfo.id}`)
       ElMessage({type: 'success', message: '登陆成功'})
     }
   })

@@ -6,8 +6,10 @@ import CardDetail from "@/components/cardDetail.vue";
 import {postDetail, queryPost} from "@/apis/main";
 import {useUserStore} from "@/stores/user";
 import {getCurrentTime} from "@/utils/getTime";
+import {useRoute} from "vue-router";
 
 const userStore = useUserStore()
+const query = useRoute().query.query
 
 // 主页卡片
 const cards = ref([]);
@@ -16,7 +18,7 @@ const disabled = ref(true); // 初始禁用滚动加载
 
 // 主页获取帖子
 const doQuery = async (offset) => {
-  const res = await queryPost({ offset });
+  const res = await queryPost({ offset, query });
   cards.value = res.info;
   disabled.value = false; // 启用滚动加载
 };
@@ -25,7 +27,7 @@ const doQuery = async (offset) => {
 const load = async () => {
   disabled.value = true;
   const offset = cards.value.length;
-  const res = await queryPost({ offset });
+  const res = await queryPost({ offset, query });
   const more = res.info;
   if (more.length === 0) {
     disabled.value = true; // 没有更多数据，禁用滚动加载
