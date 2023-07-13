@@ -8,9 +8,11 @@ import {useUserStore} from "@/stores/user";
 defineProps({
   detail: {
     type: Object,
+    required: true,
   },
   comments: {
     type: Array,
+    required: true,
   }
 })
 // 子传父
@@ -125,7 +127,7 @@ const doSomething = async (type, detail) => {
               </el-row>
               <hr/>
               <div class="comments" v-if="comments">
-                <el-empty description="现在还没有评论" v-if="comments.length === 0"/>
+                <el-empty description="现在还没有评论" v-if="!comments"/>
                 <div v-else class="commentBox">
                   <div class="commentTitle" style="margin-bottom: 10px;">共{{ comments.length }}条评论</div>
                   <div v-for="item in comments" :key="item.id">
