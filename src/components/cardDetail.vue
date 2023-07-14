@@ -1,11 +1,11 @@
 <script setup>
 import {Edit} from "@element-plus/icons-vue";
-import {ref} from "vue";
-import {doComment, doFocus, unFollow, controlUserCollectOrLike} from "@/apis/main";
+import {onMounted, ref} from "vue";
+import {doComment, doFocus, unFollow, controlUserCollectOrLike, getComment} from "@/apis/main";
 import {ElMessage} from "element-plus";
 import {useUserStore} from "@/stores/user";
 
-defineProps({
+const props = defineProps({
   detail: {
     type: Object,
     required: true,
@@ -15,8 +15,9 @@ defineProps({
     required: true,
   }
 })
+
 // 子传父
-const emit = defineEmits(['afterDoComment'])
+const emit = defineEmits(['afterDoComment', 'setComment'])
 // 评论内容
 const content = ref('')
 const userStore = useUserStore()
@@ -61,27 +62,45 @@ const doSomething = async (type, detail) => {
     const res = await controlUserCollectOrLike({post_id, operator, type})
     if (operator) {
       userStore.removeFocus(2, post_id)
-      detail.likeCount --;
+      detail.likeCount--;
       ElMessage({type: 'success', message: res.info})
     } else {
       userStore.extendUserInfo(2, post_id)
-      detail.likeCount ++;
+      detail.likeCount++;
       ElMessage({type: 'success', message: res.info})
     }
   } else if (type === 'collect') {
     const operator = checkCollect(post_id)
     const res = await controlUserCollectOrLike({post_id, operator, type})
     if (operator) {
-      detail.collectCount --;
+      detail.collectCount--;
       userStore.removeFocus(3, post_id)
       ElMessage({type: 'success', message: res.info})
     } else {
-      detail.collectCount ++;
+      detail.collectCount++;
       userStore.extendUserInfo(3, post_id)
       ElMessage({type: 'success', message: res.info})
     }
   }
 }
+
+const disabled = ref(true)
+const load = async () => {
+  disabled.value = true
+  const offset = props.comments.length
+  const id = props.detail.id
+  console.log(offset, id)
+  const res1 = await getComment({id, offset})
+  const data = res1.info
+  if (data.length !== 0){
+    disabled.value = false
+    emit('setComment', data)
+  }
+  else{
+    disabled.value = true
+  }
+}
+onMounted(() => disabled.value = false)
 </script>
 
 <template>
@@ -126,10 +145,10 @@ const doSomething = async (type, detail) => {
                 <time class="time">{{ detail.createTime }}</time>
               </el-row>
               <hr/>
-              <div class="comments" v-if="comments">
+              <div class="comments" v-if="comments" v-infinite-scroll="load" :infinite-scroll-disabled="disabled">
                 <el-empty description="现在还没有评论" v-if="!comments"/>
                 <div v-else class="commentBox">
-                  <div class="commentTitle" style="margin-bottom: 10px;">共{{ comments.length }}条评论</div>
+                  <div class="commentTitle" style="margin-bottom: 10px;">共{{ detail.commentCount }}条评论</div>
                   <div v-for="item in comments" :key="item.id">
                     <el-row :gutter="20">
                       <el-col :span="2.5">
@@ -179,7 +198,7 @@ const doSomething = async (type, detail) => {
                         d="M512 0C226.742857 0 0 197.485714 0 446.171429c0 138.971429 73.142857 270.628571 190.171429 351.085714L190.171429 1024l226.742857-138.971429c29.257143 7.314286 65.828571 7.314286 95.085714 7.314286 285.257143 0 512-197.485714 512-446.171429C1024 197.485714 797.257143 0 512 0zM256 512C219.428571 512 190.171429 482.742857 190.171429 446.171429S219.428571 380.342857 256 380.342857c36.571429 0 65.828571 29.257143 65.828571 65.828571S292.571429 512 256 512zM512 512C475.428571 512 446.171429 482.742857 446.171429 446.171429S475.428571 380.342857 512 380.342857c36.571429 0 65.828571 29.257143 65.828571 65.828571S548.571429 512 512 512zM768 512C731.428571 512 702.171429 482.742857 702.171429 446.171429s29.257143-65.828571 65.828571-65.828571c36.571429 0 65.828571 29.257143 65.828571 65.828571S804.571429 512 768 512z"
                         p-id="6376" fill="#cecccc"></path>
                   </svg>
-                  <p style="margin: 0 0 0 1px;">{{ comments.length }}</p>
+                  <p style="margin: 0 0 0 1px;">{{ detail.commentCount }}</p>
                 </div>
               </el-row>
             </div>
@@ -218,7 +237,6 @@ const doSomething = async (type, detail) => {
   border-radius: 0.8rem;
   width: 1200px;
   height: 600px;
-  overflow-y: scroll;
 }
 
 .banner {

@@ -139,3 +139,14 @@ export const controlUserCollectOrLike = ({post_id, operator, type}) => {
         }
     })
 }
+
+export const getComment = ({id, offset}) => {
+    return http({
+        url: '/comment/main/',
+        method: 'POST',
+        data: {
+            id,
+            offset
+        }
+    })
+}

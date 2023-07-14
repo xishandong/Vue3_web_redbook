@@ -50,6 +50,7 @@ const showMessage = async (id) => {
   show.value = true;
 };
 const afterDoComment = (comment) => Details.afterDoComment(comment)
+const setComment = (data) => Details.SetComment(data)
 const close = () => {
   window.history.pushState({}, "", "/");
   show.value = false;
@@ -72,7 +73,7 @@ onMounted(async () => {
           <Back/>
         </el-icon>
       </button>
-      <card-detail :detail="detail" :comments="comments" @afterDoComment="afterDoComment"/>
+      <card-detail :detail="detail" :comments="comments" @setComment="setComment" @afterDoComment="afterDoComment"/>
     </div>
   </transition>
 </template>

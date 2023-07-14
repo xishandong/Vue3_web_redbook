@@ -1,7 +1,7 @@
 import {ref} from "vue";
 import {useUserStore} from "@/stores/user";
 import {getCurrentTime} from "@/utils/getTime";
-import {postDetail} from "@/apis/main";
+import {postDetail, getComment} from "@/apis/main";
 
 export const controlDetail = () => {
     const detail = ref({})
@@ -17,12 +17,16 @@ export const controlDetail = () => {
             createTime: getCurrentTime()
         }]
         comments.value = [...comments.value, ...info]
+        detail.value.commentCount += 1
     }
 
     const getDetail = async (id) => {
         const res = await postDetail({id});
         detail.value = res.info
-        comments.value = res.info.comment
+    }
+
+    const SetComment = (comment) => {
+        comments.value = [...comments.value, ...comment]
     }
 
     return {
@@ -30,6 +34,7 @@ export const controlDetail = () => {
         comments,
         content,
         afterDoComment,
-        getDetail
+        getDetail,
+        SetComment
     }
 }

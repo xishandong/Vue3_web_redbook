@@ -92,6 +92,7 @@ const showMessage = async (id) => {
   show.value = true
 }
 const afterDoComment = (comment) => Details.afterDoComment(comment)
+const setComment = (data) => Details.SetComment(data)
 const close = () => {
   window.history.pushState({}, '', `/user/index/${userInfo.value.user.id}`);
   show.value = false
@@ -145,7 +146,7 @@ onMounted(async () => {
               <Back/>
             </el-icon>
           </button>
-          <card-detail :detail="detail" :comments="comments" @afterDoComment="afterDoComment" v-if="detail.id"/>
+          <card-detail :detail="detail" :comments="comments" @afterDoComment="afterDoComment" @setComment="setComment" v-if="detail.id"/>
         </div>
       </transition>
     </div>
@@ -164,7 +165,7 @@ onMounted(async () => {
               <Back/>
             </el-icon>
           </button>
-          <card-detail :detail="detail" @afterDoComment="afterDoComment"/>
+          <card-detail :detail="detail" :comments="comments" @setComment="setComment" @afterDoComment="afterDoComment"/>
         </div>
       </transition>
     </div>
@@ -183,7 +184,7 @@ onMounted(async () => {
               <Back/>
             </el-icon>
           </button>
-          <card-detail :detail="detail" @afterDoComment="afterDoComment"/>
+          <card-detail :detail="detail" :comments="comments" @setComment="setComment" @afterDoComment="afterDoComment"/>
         </div>
       </transition>
     </div>
