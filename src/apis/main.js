@@ -150,3 +150,19 @@ export const getComment = ({id, offset}) => {
         }
     })
 }
+
+export const queryUserPostControl = () => {
+    return http({
+        url: '/user/post/control/',
+    })
+}
+
+export const postDelete = ({id}) => {
+    return http({
+        url: '/post/delete/',
+        method: 'POST',
+        data: {
+            id
+        }
+    })
+}

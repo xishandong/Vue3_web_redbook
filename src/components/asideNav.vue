@@ -1,6 +1,6 @@
 <script setup>
 import {ref} from "vue";
-import {Promotion, Expand, Close, Edit, Tools, User, Lock} from "@element-plus/icons-vue";
+import {Promotion, Expand, Close, Tools, HelpFilled} from "@element-plus/icons-vue";
 import {useUserStore} from "@/stores/user";
 import Login from '@/views/Login/index.vue'
 import {ElMessage} from "element-plus";
@@ -52,7 +52,6 @@ const handleChange = (uploadFile, uploadFiles) => {
     upload.value.handleRemove(uploadFile);
     return false;
   }
-
   return true;
 };
 const onSuccess = async (response) => {
@@ -165,6 +164,18 @@ const doUpdate = async () => {
             </el-icon>
             <h5 class="menuText" :class="{ open2: isMenuOpen }">更新个人信息</h5>
           </div>
+        </el-tooltip>
+      </li>
+      <li class="menuItem" v-if="userStore.userInfo.id">
+        <el-tooltip effect="dark" content="个人帖子管理" placement="right">
+          <RouterLink to="/user/control">
+            <div class="menuOption">
+              <el-icon size="x-large">
+                <HelpFilled/>
+              </el-icon>
+              <h5 class="menuText" :class="{ open2: isMenuOpen }">个人帖子管理</h5>
+            </div>
+          </RouterLink>
         </el-tooltip>
       </li>
     </ul>

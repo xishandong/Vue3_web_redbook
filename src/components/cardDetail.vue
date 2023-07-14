@@ -146,7 +146,7 @@ onMounted(() => disabled.value = false)
               </el-row>
               <hr/>
               <div class="comments" v-if="comments" v-infinite-scroll="load" :infinite-scroll-disabled="disabled">
-                <el-empty description="现在还没有评论" v-if="!comments"/>
+                <el-empty description="现在还没有评论" v-if="comments.length === 0"/>
                 <div v-else class="commentBox">
                   <div class="commentTitle" style="margin-bottom: 10px;">共{{ detail.commentCount }}条评论</div>
                   <div v-for="item in comments" :key="item.id">

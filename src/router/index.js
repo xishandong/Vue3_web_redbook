@@ -6,6 +6,7 @@ import Explore from '@/views/Explore/index.vue'
 import UserIndex from '@/views/UserIndex/index.vue'
 import Uploads from '@/views/Uploads/index.vue'
 import NotFound from '@/views/NotFound/index.vue'
+import UserPostControl from '@/views/UserPostControl/index.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,6 +31,10 @@ const router = createRouter({
                     path: '/user/uploads',
                     component: Uploads
                 },
+                {
+                    path: '/user/control',
+                    component: UserPostControl
+                }
             ]
         },
         {

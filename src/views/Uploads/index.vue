@@ -115,15 +115,16 @@ const MakePrev = () => {
     return
   }
   postData.value = {
+    id: 1,
     title: title.value,
     content: content.value,
     user: userStore.userInfo,
-    comment: [],
     imgs: fileListUrl.value,
     createTime: getCurrentTime()
   }
   show.value = true
 }
+const empty = []
 </script>
 
 <template>
@@ -200,7 +201,7 @@ const MakePrev = () => {
         <Back/>
       </el-icon>
     </button>
-    <card-detail :detail="postData"/>
+    <card-detail :detail="postData" :comments="empty"/>
   </div>
 </template>
 
