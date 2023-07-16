@@ -63,23 +63,31 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="container" v-infinite-scroll="load" :infinite-scroll-disabled="disabled">
-    <home-card :cards="cards" @show-detail="showMessage"></home-card>
+  <div class="Empty" v-if="cards.length === 0">
+    <el-empty description="没有帖子..."/>
   </div>
-  <transition name="fade">
-    <div class="overlay" v-if="show" :style="{ transformOrigin: `${overlayX}px ${overlayY}px` }">
-      <button class="backPage" @click="close">
-        <el-icon>
-          <Back/>
-        </el-icon>
-      </button>
-      <card-detail :detail="detail" :comments="comments" @setComment="setComment" @afterDoComment="afterDoComment"/>
+  <div v-else>
+    <div class="container" v-infinite-scroll="load" :infinite-scroll-disabled="disabled">
+      <home-card :cards="cards" @show-detail="showMessage"></home-card>
     </div>
-  </transition>
+    <transition name="fade">
+      <div class="overlay" v-if="show" :style="{ transformOrigin: `${overlayX}px ${overlayY}px` }">
+        <button class="backPage" @click="close">
+          <el-icon>
+            <Back/>
+          </el-icon>
+        </button>
+        <card-detail :detail="detail" :comments="comments" @setComment="setComment" @afterDoComment="afterDoComment"/>
+      </div>
+    </transition>
+  </div>
 </template>
 
 
 <style scoped>
+.Empty{
+  margin-top: 10%;
+}
 .container {
   column-count: 5; /* 设置列数，可以根据需要调整列数 */
   column-gap: 20px; /* 设置列之间的间隔为20px */

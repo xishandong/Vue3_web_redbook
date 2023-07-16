@@ -151,9 +151,13 @@ export const getComment = ({id, offset}) => {
     })
 }
 
-export const queryUserPostControl = () => {
+export const queryUserPostControl = ({offset}) => {
     return http({
         url: '/user/post/control/',
+        method: 'POST',
+        data: {
+            offset
+        }
     })
 }
 
