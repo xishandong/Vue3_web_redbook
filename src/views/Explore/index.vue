@@ -39,7 +39,6 @@ const detail = Details.detail;
 const show = ref(false);
 const overlayX = ref(0); // 覆盖层的水平位置
 const overlayY = ref(0); // 覆盖层的垂直位置
-const comments = Details.comments // 评论发送后展示在页面上
 const content = Details.content // 评论内容
 const getDetails = async (id) => Details.getDetail(id)
 const showMessage = async (id) => {
@@ -50,7 +49,6 @@ const showMessage = async (id) => {
   show.value = true;
 };
 const afterDoComment = (comment) => Details.afterDoComment(comment)
-const setComment = (data) => Details.SetComment(data)
 const close = () => {
   window.history.pushState({}, "", "/");
   show.value = false;
@@ -77,7 +75,7 @@ onMounted(async () => {
             <Back/>
           </el-icon>
         </button>
-        <card-detail :detail="detail" :comments="comments" @setComment="setComment" @afterDoComment="afterDoComment"/>
+        <card-detail :detail="detail" @afterDoComment="afterDoComment"/>
       </div>
     </transition>
   </div>

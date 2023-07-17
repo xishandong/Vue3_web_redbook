@@ -181,3 +181,14 @@ export const removeFan = ({id}) => {
         }
     })
 }
+
+export const loadReplies = ({id, offset}) => {
+    return http({
+        url: '/comment/reply/',
+        method: 'POST',
+        data: {
+            id,
+            offset
+        }
+    })
+}

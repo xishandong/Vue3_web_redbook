@@ -10,13 +10,7 @@ export const controlDetail = () => {
     const content = ref('')
     const userStore = useUserStore()
 
-    const afterDoComment = (comment) => {
-        const info = [{
-            user: userStore.userInfo,
-            content: comment.content,
-            createTime: getCurrentTime()
-        }]
-        comments.value = [...comments.value, ...info]
+    const afterDoComment = () => {
         detail.value.commentCount += 1
     }
 
@@ -28,6 +22,7 @@ export const controlDetail = () => {
     const SetComment = (comment) => {
         comments.value = [...comments.value, ...comment]
     }
+
 
     return {
         detail,

@@ -1,26 +1,23 @@
 <script setup>
-import {Edit} from "@element-plus/icons-vue";
+import {ChatRound, Edit} from "@element-plus/icons-vue";
 import {onMounted, ref} from "vue";
-import {doComment, doFocus, unFollow, controlUserCollectOrLike, getComment} from "@/apis/main";
+import {doComment, doFocus, unFollow, controlUserCollectOrLike, getComment, loadReplies} from "@/apis/main";
 import {ElMessage} from "element-plus";
 import {useUserStore} from "@/stores/user";
+import {getCurrentTime} from "@/utils/getTime";
 
 const props = defineProps({
   detail: {
     type: Object,
     required: true,
-  },
-  comments: {
-    type: Array,
-    required: true,
   }
 })
-
+const comments = ref([])
 // 子传父
-const emit = defineEmits(['afterDoComment', 'setComment'])
-// 评论内容
-const content = ref('')
+const emit = defineEmits(['afterDoComment'])
 const userStore = useUserStore()
+
+// 更改用户对帖子的状态 /////////////////////////////////////////////////
 const doFocusOn = async (id) => {
   if (userStore.userInfo.id === id) {
     ElMessage({type: 'warning', message: '不能对自己进行关注操作'})
@@ -44,17 +41,7 @@ const checkCollect = (id) => {
 const checkFavorite = (id) => {
   return userStore.userFavorite.includes(id)
 }
-const comment = async (post, to) => {
-  const data = {
-    post_id: post.id,
-    content: content.value,
-    parent_comment_id: to
-  }
-  const res = await doComment({data})
-  content.value = ''
-  ElMessage({type: 'success', message: res.info})
-  emit('afterDoComment', data)
-}
+//更改帖子的点赞收藏状态
 const doSomething = async (type, detail) => {
   const post_id = detail.id
   if (type === 'like') {
@@ -83,23 +70,77 @@ const doSomething = async (type, detail) => {
     }
   }
 }
+//////////////////////////////////////////////////////////////////
 
+// 评论内容////////////////////////////////////////////////////////
+const content = ref('')
+const to = ref(0)
+const commentInput = ref(null)
+const sendComment = async (post, to) => {
+  const info = [{
+      user: userStore.userInfo,
+      content: content.value,
+      createTime: getCurrentTime(),
+      replyCount: 0
+    }]
+  if (to === 0 || to === '0') {
+    const data = {
+      post_id: post.id,
+      content: content.value,
+    }
+    const res = await doComment({data})
+    ElMessage({type: 'success', message: res.info})
+    comments.value = [...comments.value, ...info]
+  } else {
+    const data = {
+      post_id: post.id,
+      content: content.value,
+      parent_comment_id: to
+    }
+    const res = await doComment({data})
+    ElMessage({type: 'success', message: res.info})
+    const comment = comments.value.find(item => item.id === to);
+    comment.replies = [...comment.replies, ...info]
+    clearReply()
+  }
+  emit('afterDoComment')
+  content.value = ''
+}
+const commentMain = (item) => {
+  to.value = item.id
+  const toPeople = item.user.username
+  commentInput.value.input.placeholder = `回复${toPeople}: `
+}
+const loadReply = async (item) => {
+  const offset = item.replies.length
+  const id = item.id
+  const res = await loadReplies({id, offset})
+  item.replies = [...item.replies, ...res.info]
+  item.replyCount -= res.count
+}
+const clearReply = () => {
+  commentInput.value.input.placeholder = `说点什么....`
+  to.value = 0
+}
+/////////////////////////////////////////////////////////////////
+
+// 无限加载评论 //////////////////////////////////////////////////
 const disabled = ref(true)
 const load = async () => {
   disabled.value = true
-  const offset = props.comments.length
+  const offset = comments.value.length
   const id = props.detail.id
-  console.log(offset, id)
   const res1 = await getComment({id, offset})
   const data = res1.info
-  if (data.length !== 0){
+  if (data.length !== 0) {
     disabled.value = false
-    emit('setComment', data)
-  }
-  else{
+    comments.value = [...comments.value, ...data]
+  } else {
     disabled.value = true
   }
 }
+//////////////////////////////////////////////////////////////
+
 onMounted(() => disabled.value = false)
 </script>
 
@@ -107,6 +148,7 @@ onMounted(() => disabled.value = false)
   <div class="box" v-if="detail.id">
     <el-card style="border-radius: 0.8rem;">
       <el-row :gutter="50">
+        <!-- 图片区 -->
         <el-col :span="50">
           <div class="banner">
             <el-carousel height="600px">
@@ -118,8 +160,11 @@ onMounted(() => disabled.value = false)
             </el-carousel>
           </div>
         </el-col>
+        <!-- 图片区结束 -->
+        <!-- 卡牌详情区 -->
         <el-col :span="50">
           <div class="info" style="width: 500px;">
+            <!-- 卡片头部 -->
             <el-row style="align-items: center;width: 500px;">
               <a :href="`/user/index/${detail.user.id}`">
                 <el-avatar :src="detail.user.avatar" size="large"/>
@@ -134,7 +179,9 @@ onMounted(() => disabled.value = false)
               </el-popconfirm>
               <button class="focusOn" v-else @click="doFocusOn(detail.user.id)">关注</button>
             </el-row>
+            <!-- 卡片头部结束 -->
             <div class="main-content">
+              <!-- 卡片内容 -->
               <el-row style="margin-top: 20px;">
                 <h2>{{ detail.title }}</h2>
               </el-row>
@@ -144,7 +191,9 @@ onMounted(() => disabled.value = false)
               <el-row>
                 <time class="time">{{ detail.createTime }}</time>
               </el-row>
+              <!-- 卡片内容结束 -->
               <hr/>
+              <!-- 评论区 -->
               <div class="comments" v-if="comments" v-infinite-scroll="load" :infinite-scroll-disabled="disabled">
                 <el-empty description="现在还没有评论" v-if="comments.length === 0"/>
                 <div v-else class="commentBox">
@@ -160,6 +209,30 @@ onMounted(() => disabled.value = false)
                         <div style="color:#33333399;">{{ item.user.username }}</div>
                         <div style="color:#333333;margin-top: 2px;margin-bottom: 10px;">{{ item.content }}</div>
                         <time class="time">{{ item.createTime }}</time>
+                        <el-icon style="float: right;font-size: medium" @click="commentMain(item)">
+                          <ChatRound/>
+                        </el-icon>
+                      </el-col>
+                      <el-col style="margin-top: 5px;">
+                        <div v-for="reply in item.replies" :key="reply.id" style="margin-left: 30px">
+                          <!-- 渲染子评论的内容 -->
+                          <el-row :gutter="20">
+                            <el-col :span="2.5">
+                              <a :href="`/user/index/${reply.user.id}`">
+                                <el-avatar :src="reply.user.avatar" :size="25"></el-avatar>
+                              </a>
+                            </el-col>
+                            <el-col :span="20" style="font-size: 12px">
+                              <div style="color:#33333399;">{{ reply.user.username }}</div>
+                              <div style="color:#333333;margin-top: 2px;margin-bottom: 10px;">{{ reply.content }}</div>
+                              <time class="time">{{ reply.createTime }}</time>
+                            </el-col>
+                          </el-row>
+                        </div>
+                        <div class="more" @click="loadReply(item)" v-if="item.replyCount > 0">展开{{
+                            item.replyCount
+                          }}条回复
+                        </div>
                       </el-col>
                     </el-row>
                     <el-divider/>
@@ -167,6 +240,7 @@ onMounted(() => disabled.value = false)
                 </div>
               </div>
             </div>
+            <!-- 评论区结束 -->
             <el-divider/>
           </div>
           <div class="bottomArea">
@@ -191,7 +265,7 @@ onMounted(() => disabled.value = false)
                   </svg>
                   <p style="margin: 0 0 0 1px;">{{ detail.collectCount }}</p>
                 </div>
-                <div class="warp">
+                <div class="warp" @click="clearReply">
                   <svg t="1689148939874" class="icon" viewBox="0 0 1024 1024" version="1.1" style="margin-bottom: 2px;"
                        xmlns="http://www.w3.org/2000/svg" p-id="6375" width="25" height="25">
                     <path
@@ -203,11 +277,12 @@ onMounted(() => disabled.value = false)
               </el-row>
             </div>
             <el-input
-                v-model="content" class="comment-input" type="text" placeholder="说点什么..."
-                :prefix-icon="Edit" @keyup.enter="comment(detail)" clearable
+                v-model="content" class="comment-input" type="text" placeholder="说点什么..." ref="commentInput"
+                :prefix-icon="Edit" @keyup.enter="sendComment(detail, to)" clearable
             />
           </div>
         </el-col>
+        <!-- 卡牌详情区结束 -->
       </el-row>
     </el-card>
   </div>
@@ -222,6 +297,14 @@ onMounted(() => disabled.value = false)
   color: #333;
   white-space: pre-wrap;
   overflow-wrap: break-word;
+}
+
+.more {
+  margin-left: 32px;
+  margin-top: 16px;
+  line-height: 18px;
+  color: #13386c;
+  cursor: pointer;
 }
 
 .commentTitle {

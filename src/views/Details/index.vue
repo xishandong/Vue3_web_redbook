@@ -7,18 +7,16 @@ import {controlDetail} from "@/utils/controlDetail";
 const route = useRoute();
 const Detail = controlDetail();
 const detail = Detail.detail
-const comments = Detail.comments
 // 评论内容
 const content = Detail.content
 const getDetail = () => Detail.getDetail(route.params.id)
-const setComment = (data) => Detail.SetComment(data)
 const afterDoComment = (comment) => Detail.afterDoComment(comment)
 
 onMounted(() => getDetail())
 </script>
 
 <template>
-  <card-detail :detail="detail" :comments="comments" @afterDoComment="afterDoComment" @setComment="setComment" v-if="detail.id"/>
+  <card-detail :detail="detail" @afterDoComment="afterDoComment" v-if="detail.id"/>
 </template>
 
 <style scoped>

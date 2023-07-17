@@ -78,7 +78,6 @@ const load = async () => {
 
 // 卡片详情页的内容 //////////////////////////////////////////////////////////
 const detail = Details.detail
-const comments = Details.comments
 const overlayX = ref(0); // 覆盖层的水平位置
 const overlayY = ref(0); // 覆盖层的垂直位置
 // 卡片详情
@@ -146,7 +145,7 @@ onMounted(async () => {
               <Back/>
             </el-icon>
           </button>
-          <card-detail :detail="detail" :comments="comments" @afterDoComment="afterDoComment" @setComment="setComment" v-if="detail.id"/>
+          <card-detail :detail="detail" @afterDoComment="afterDoComment" v-if="detail.id"/>
         </div>
       </transition>
     </div>
@@ -165,7 +164,7 @@ onMounted(async () => {
               <Back/>
             </el-icon>
           </button>
-          <card-detail :detail="detail" :comments="comments" @setComment="setComment" @afterDoComment="afterDoComment"/>
+          <card-detail :detail="detail" @afterDoComment="afterDoComment"/>
         </div>
       </transition>
     </div>
@@ -184,7 +183,7 @@ onMounted(async () => {
               <Back/>
             </el-icon>
           </button>
-          <card-detail :detail="detail" :comments="comments" @setComment="setComment" @afterDoComment="afterDoComment"/>
+          <card-detail :detail="detail" @afterDoComment="afterDoComment"/>
         </div>
       </transition>
     </div>
