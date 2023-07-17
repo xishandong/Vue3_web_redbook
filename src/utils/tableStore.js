@@ -11,6 +11,7 @@ export const useTableStore = defineStore('table', () => {
         return cachedData ? cachedData : false;
     };
     return {
+        tableStoreData,
         storeMessage,
         retrieveData
     }

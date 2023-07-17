@@ -53,7 +53,6 @@ const type = computed(() => {
 const changeShow = async () => {
   // 先将多选置空
   multipleSelection.value = [];
-
   const valueType = value.value;
   const offset = 0;
   const types = valueType;
@@ -66,7 +65,7 @@ const changeShow = async () => {
       const res = await queryUserPostControl({offset, types});
       tableData.value = res.info;
       total_post.value = res.total;
-      tableStore.storeMessage(types, currentPage.value, res.info, res.total);
+      tableStore.storeMessage(types, 1, res.info, res.total);
     }
   } else {
     if (data) {
@@ -76,10 +75,10 @@ const changeShow = async () => {
       const res = await queryUserPostControl({offset, types});
       userData.value = res.info;
       total_user.value = res.total;
-      tableStore.storeMessage(types, currentPage.value, res.info, res.total);
+      tableStore.storeMessage(types, 1, res.info, res.total);
     }
-    currentPage.value = 1;
   }
+  currentPage.value = 1;
 };
 ////////////////////////////////////////////////////////////////
 
@@ -94,7 +93,7 @@ const getData = async () => {
   const res = await queryUserPostControl({offset, types})
   tableData.value = res.info
   total_post.value = res.total
-  tableStore.storeMessage(types, currentPage.value, res.info, res.total)
+  tableStore.storeMessage(types, 1, res.info, res.total)
 }
 const handleSelectionChange = (val) => {
   multipleSelection.value = val
