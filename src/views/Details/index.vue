@@ -2,7 +2,7 @@
 import {onMounted} from "vue";
 import {useRoute} from "vue-router";
 import CardDetail from "@/components/cardDetail.vue";
-import {controlDetail} from "@/utils/controlDetail";
+import {controlDetail} from "@/stores/controlDetail";
 
 const route = useRoute();
 const Detail = controlDetail();

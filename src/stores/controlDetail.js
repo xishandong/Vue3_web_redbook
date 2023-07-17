@@ -1,7 +1,6 @@
 import {ref} from "vue";
 import {useUserStore} from "@/stores/user";
-import {getCurrentTime} from "@/utils/getTime";
-import {postDetail, getComment} from "@/apis/main";
+import {postDetail} from "@/apis/main";
 
 export const controlDetail = () => {
     const detail = ref({})

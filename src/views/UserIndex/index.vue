@@ -5,7 +5,7 @@ import HomeCard from "@/components/homeCard.vue";
 import CardDetail from "@/components/cardDetail.vue";
 import {Back} from "@element-plus/icons-vue";
 import {queryUserIndex, queryUserPost} from "@/apis/main";
-import {controlDetail} from "@/utils/controlDetail";
+import {controlDetail} from "@/stores/controlDetail";
 import {onClickOutside} from "@vueuse/core";
 
 const route = useRoute()

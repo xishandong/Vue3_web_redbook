@@ -202,7 +202,7 @@ onMounted(() => load())
               <div class="comments" v-if="comments" v-infinite-scroll="load" :infinite-scroll-disabled="disabled">
                 <el-empty description="现在还没有评论" v-if="comments.length === 0"/>
                 <div v-else class="commentBox">
-                  <div class="commentTitle" style="margin-bottom: 10px;">共{{ detail.commentCount }}条评论</div>
+                  <div class="commentTitle" style="margin-bottom: 5px;">共{{ detail.commentCount }}条评论</div>
                   <div v-for="item in comments" :key="item.id">
                     <el-row :gutter="20">
                       <el-col :span="2.5">
@@ -212,7 +212,7 @@ onMounted(() => load())
                       </el-col>
                       <el-col :span="20" style="font-size: 14px">
                         <div style="color:#33333399;">{{ item.user.username }}</div>
-                        <div style="color:#333333;margin-top: 2px;margin-bottom: 10px;">{{ item.content }}</div>
+                        <div style="color:#333333;margin-top: 2px;margin-bottom: 5px;">{{ item.content }}</div>
                         <time class="time">{{ item.createTime }}</time>
                         <el-icon style="float: right;font-size: medium" @click="commentMain(item)">
                           <ChatRound/>

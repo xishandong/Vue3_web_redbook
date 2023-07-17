@@ -5,7 +5,7 @@ import {Back} from "@element-plus/icons-vue";
 import CardDetail from "@/components/cardDetail.vue";
 import {queryPost} from "@/apis/main";
 import {useRoute} from "vue-router";
-import {controlDetail} from "@/utils/controlDetail";
+import {controlDetail} from "@/stores/controlDetail";
 import {onClickOutside} from '@vueuse/core';
 
 const query = useRoute().query.query

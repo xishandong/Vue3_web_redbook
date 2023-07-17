@@ -4,9 +4,11 @@ import {queryUserPostControl, postDelete, controlUserCollectOrLike, unFollow, re
 import {ElMessage} from 'element-plus'
 import {useUserStore} from "@/stores/user";
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+import {useTableStore} from "@/utils/tableStore";
 
-// 配置全局语言/////////////////////////////////////////////////////
+// 配置全局语言和表格缓存//////////////////////////////////////////////
 const locale = zhCn
+const tableStore = useTableStore();
 
 // 控制选择器 /////////////////////////////////////////////////////
 const value = ref('posts')
@@ -48,23 +50,39 @@ const type = computed(() => {
   else
     return 2
 })
-const changeShow = async (val) => {
+const changeShow = async () => {
+  // 先将多选置空
+  multipleSelection.value = [];
+
+  const valueType = value.value;
+  const offset = 0;
+  const types = valueType;
+
   if (type.value === 1) {
-    const offset = 0
-    const types = value.value
-    const res = await queryUserPostControl({offset, types})
-    tableData.value = res.info
-    total_post.value = res.total
-    currentPage.value = 1
+    if (tableStore.checkExists(valueType, 1)) {
+      const data = tableStore.retrieveData(valueType, 1);
+      tableData.value = data.data;
+      total_post.value = data.total;
+    } else {
+      const res = await queryUserPostControl({offset, types});
+      tableData.value = res.info;
+      total_post.value = res.total;
+      tableStore.storeMessage(types, currentPage.value, res.info, res.total);
+    }
   } else {
-    const offset = 0
-    const types = value.value
-    const res = await queryUserPostControl({offset, types})
-    userData.value = res.info
-    total_user.value = res.total
-    currentPage.value = 1
+    if (tableStore.checkExists(valueType, 1)) {
+      const data = tableStore.retrieveData(valueType, 1);
+      userData.value = data.data;
+      total_user.value = data.total;
+    } else {
+      const res = await queryUserPostControl({offset, types});
+      userData.value = res.info;
+      total_user.value = res.total;
+      tableStore.storeMessage(types, currentPage.value, res.info, res.total);
+    }
+    currentPage.value = 1;
   }
-}
+};
 ////////////////////////////////////////////////////////////////
 
 // 表格/////////////////////////////////////////////////////////
@@ -78,6 +96,7 @@ const getData = async () => {
   const res = await queryUserPostControl({offset, types})
   tableData.value = res.info
   total_post.value = res.total
+  tableStore.storeMessage(types, currentPage.value, res.info, res.total)
 }
 const handleSelectionChange = (val) => {
   multipleSelection.value = val
@@ -102,7 +121,7 @@ const handleDelete = async (index, row) => {
       ElMessage({type: 'success', message: res.info})
     } else if (value.value === 'follow') {
       const res = await unFollow({id})
-      let userStore = useUserStore();
+      const userStore = useUserStore();
       userStore.removeFocus(1, id)
       ElMessage({type: 'success', message: res.info})
     }
@@ -117,18 +136,38 @@ const currentPage = ref(1)
 const total_post = ref(0)
 const total_user = ref(0)
 const handleCurrentChange = async (val) => {
-  const offset = (val - 1) * pageSize.value
-  const types = value.value
+  const offset = (val - 1) * pageSize.value;
+  const types = value.value;
+  let data, total;
   if (type.value === 1) {
-    const res = await queryUserPostControl({offset, types})
-    tableData.value = res.info
-    total_post.value = res.total
+    if (tableStore.checkExists(types, val)) {
+      const cachedData = tableStore.retrieveData(types, val);
+      data = cachedData.data;
+      total = cachedData.total;
+    } else {
+      const res = await queryUserPostControl({offset, types});
+      data = res.info;
+      total = res.total;
+      tableStore.storeMessage(types, val, data, total);
+    }
+    tableData.value = data;
+    total_post.value = total;
   } else {
-    const res = await queryUserPostControl({offset, types})
-    userData.value = res.info
-    total_user.value = res.total
+    if (tableStore.checkExists(types, val)) {
+      const cachedData = tableStore.retrieveData(types, val);
+      data = cachedData.data;
+      total = cachedData.total;
+    } else {
+      const res = await queryUserPostControl({offset, types});
+      data = res.info;
+      total = res.total;
+      tableStore.storeMessage(types, val, data, total);
+    }
+    userData.value = data;
+    total_user.value = total;
   }
-}
+};
+
 //////////////////////////////////////////////////////////////////
 onMounted(() => getData())
 </script>
