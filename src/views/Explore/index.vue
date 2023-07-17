@@ -6,6 +6,7 @@ import CardDetail from "@/components/cardDetail.vue";
 import {queryPost} from "@/apis/main";
 import {useRoute} from "vue-router";
 import {controlDetail} from "@/utils/controlDetail";
+import {onClickOutside} from '@vueuse/core';
 
 const query = useRoute().query.query
 const Details = controlDetail()
@@ -58,6 +59,11 @@ const close = () => {
 onMounted(async () => {
   await doQuery(0);
 });
+
+const overlay = ref(null)
+onClickOutside(overlay, () => {
+  show.value = false;
+});
 </script>
 
 <template>
@@ -75,7 +81,7 @@ onMounted(async () => {
             <Back/>
           </el-icon>
         </button>
-        <card-detail :detail="detail" @afterDoComment="afterDoComment"/>
+        <card-detail :detail="detail" @afterDoComment="afterDoComment" ref="overlay"/>
       </div>
     </transition>
   </div>
@@ -83,9 +89,10 @@ onMounted(async () => {
 
 
 <style scoped>
-.Empty{
+.Empty {
   margin-top: 10%;
 }
+
 .container {
   column-count: 5; /* 设置列数，可以根据需要调整列数 */
   column-gap: 20px; /* 设置列之间的间隔为20px */

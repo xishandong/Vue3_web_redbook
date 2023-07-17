@@ -6,6 +6,7 @@ import CardDetail from "@/components/cardDetail.vue";
 import {Back} from "@element-plus/icons-vue";
 import {queryUserIndex, queryUserPost} from "@/apis/main";
 import {controlDetail} from "@/utils/controlDetail";
+import {onClickOutside} from "@vueuse/core";
 
 const route = useRoute()
 const Details = controlDetail()
@@ -103,6 +104,10 @@ onMounted(async () => {
   await Toggle()
 })
 
+const overlay = ref(null)
+onClickOutside(overlay, () => {
+  show.value = false;
+});
 </script>
 
 <template>
@@ -145,7 +150,7 @@ onMounted(async () => {
               <Back/>
             </el-icon>
           </button>
-          <card-detail :detail="detail" @afterDoComment="afterDoComment" v-if="detail.id"/>
+          <card-detail :detail="detail" @afterDoComment="afterDoComment" ref="overlay"/>
         </div>
       </transition>
     </div>
@@ -155,7 +160,7 @@ onMounted(async () => {
       </div>
       <div class="container" v-infinite-scroll="load" :infinite-scroll-disabled="disabled" infinite-scroll-distance="0"
            v-else>
-        <home-card :cards="userCollect" @show-detail="showMessage"></home-card>
+        <home-card :cards="userCollect" ref="overlay" @show-detail="showMessage"></home-card>
       </div>
       <transition name="fade">
         <div class="overlay" v-if="show" :style="{ transformOrigin: `${overlayX}px ${overlayY}px` }">
@@ -164,7 +169,7 @@ onMounted(async () => {
               <Back/>
             </el-icon>
           </button>
-          <card-detail :detail="detail" @afterDoComment="afterDoComment"/>
+          <card-detail :detail="detail" ref="overlay" @afterDoComment="afterDoComment"/>
         </div>
       </transition>
     </div>
