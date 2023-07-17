@@ -300,7 +300,7 @@ const doUpdate = async () => {
 .close {
   border: 0;
   position: absolute;
-  left: 71%;
+  left: 64%;
   top: 18%;
   background-color: #fff;
   z-index: 1000; /* 设置一个较大的z-index值，确保图层位于其他内容之上 */

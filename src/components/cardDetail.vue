@@ -141,7 +141,7 @@ const load = async () => {
 }
 //////////////////////////////////////////////////////////////
 
-onMounted(() => disabled.value = false)
+onMounted(() => load())
 </script>
 
 <template>
