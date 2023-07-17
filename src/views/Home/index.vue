@@ -20,7 +20,7 @@
 
 <style scoped>
 .maxSize {
-  height: 650px;
+  height: 700px;
   overflow-y: scroll;
 }
 </style>

@@ -48,7 +48,7 @@ const load = async () => {
   if (types === '帖子') {
     const offset = userPost.value.length;
     const post = await queryUserPost({user_id, types, offset});
-    if (post.length === 0) {
+    if (post.info.length === 0) {
       disabled.value = true;
     } else {
       userPost.value = [...userPost.value, ...post.info];
@@ -57,7 +57,7 @@ const load = async () => {
   } else if (types === '点赞') {
     const offset = userFavorite.value.length;
     const like = await queryUserPost({user_id, types, offset});
-    if (like.length === 0) {
+    if (like.info.length === 0) {
       disabled.value = true;
     } else {
       userFavorite.value = [...userFavorite.value, ...like.info];
@@ -66,7 +66,7 @@ const load = async () => {
   } else if (types === '收藏') {
     const offset = userCollect.value.length;
     const collect = await queryUserPost({user_id, types, offset});
-    if (collect.length === 0) {
+    if (collect.info.length === 0) {
       disabled.value = true;
     } else {
       userCollect.value = [...userCollect.value, ...collect.info];

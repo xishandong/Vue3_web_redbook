@@ -320,6 +320,7 @@ onMounted(() => disabled.value = false)
   border-radius: 0.8rem;
   width: 1200px;
   height: 600px;
+  margin-top: 40px;
 }
 
 .banner {
