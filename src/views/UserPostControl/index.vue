@@ -1,54 +1,152 @@
 <script setup>
 import {computed, onMounted, ref} from 'vue'
-import {queryUserPostControl, postDelete} from "@/apis/main";
+import {queryUserPostControl, postDelete, controlUserCollectOrLike, unFollow, removeFan} from "@/apis/main";
 import {ElMessage} from 'element-plus'
+import {useUserStore} from "@/stores/user";
 
-const search = ref('')
-const filterTableData = computed(() =>
-    tableData.value.filter(
-        (data) =>
-            !search.value ||
-            data.title.toLowerCase().includes(search.value.toLowerCase())
-    )
-)
-const handleDelete = async (index, row) => {
-  const id = row.id
-  const res = await postDelete({id})
-  tableData.value.splice(index, 1)
-  ElMessage({type: 'success', message: res.success})
+// 控制选择器 /////////////////////////////////////////////////////
+const value = ref('posts')
+const options = [
+  {
+    label: '帖子管理',
+    options: [
+      {
+        value: 'posts',
+        label: '个人帖子管理',
+      },
+      {
+        value: 'collected',
+        label: '收藏帖子管理',
+      },
+      {
+        value: 'favorites',
+        label: '喜欢帖子管理'
+      }
+    ],
+  },
+  {
+    label: '个人用户管理',
+    options: [
+      {
+        value: 'fans',
+        label: '粉丝管理',
+      },
+      {
+        value: 'follow',
+        label: '关注管理',
+      },
+    ],
+  },
+]
+const type = computed(() => {
+  if (value.value === 'posts' || value.value === 'collected' || value.value === 'favorites')
+    return 1
+  else
+    return 2
+})
+const changeShow = async (val) => {
+  if (type.value === 1) {
+    const offset = 0
+    const types = value.value
+    const res = await queryUserPostControl({offset, types})
+    tableData.value = res.info
+    total_post.value = res.total
+    currentPage.value = 1
+  } else {
+    const offset = 0
+    const types = value.value
+    const res = await queryUserPostControl({offset, types})
+    userData.value = res.info
+    total_user.value = res.total
+    currentPage.value = 1
+  }
 }
+////////////////////////////////////////////////////////////////
 
+// 表格/////////////////////////////////////////////////////////
 const tableData = ref([])
+const userData = ref([])
+const multipleSelection = ref([])
+const tableRef = ref(null)
 const getData = async () => {
   const offset = 0
-  const res = await queryUserPostControl({offset})
+  const types = value.value
+  const res = await queryUserPostControl({offset, types})
   tableData.value = res.info
-  total.value = res.total
+  total_post.value = res.total
 }
-const multipleSelection = ref([])
 const handleSelectionChange = (val) => {
   multipleSelection.value = val
 }
+const handleDelete = async (index, row) => {
+  const id = row.id
+  if (type.value === 1) {
+    if (value.value === 'posts') {
+      const res = await postDelete({id})
+      ElMessage({type: 'success', message: res.success})
+    } else if (value.value === 'collected' || value.value === 'favorites') {
+      const post_id = id
+      const operator = 1
+      const type = value.value === 'collected' ? 'collect' : 'like'
+      const res = await controlUserCollectOrLike({post_id, operator, type})
+      ElMessage({type: 'success', message: res.info})
+    }
+    tableData.value.splice(index, 1)
+  } else {
+    if (value.value === 'fans') {
+      const res = await removeFan({id})
+      ElMessage({type: 'success', message: res.info})
+    } else if (value.value === 'follow') {
+      const res = await unFollow({id})
+      let userStore = useUserStore();
+      userStore.removeFocus(1, id)
+      ElMessage({type: 'success', message: res.info})
+    }
+    userData.value.splice(index, 1)
+  }
+}
+////////////////////////////////////////////////////////////////
 
-onMounted(() => getData())
-
-const tableRef = ref(null)
+// 分页器 ///////////////////////////////////////////////////////
 const pageSize = ref(10)
 const currentPage = ref(1)
-const total = ref(0)
+const total_post = ref(0)
+const total_user = ref(0)
 const handleCurrentChange = async (val) => {
   const offset = (val - 1) * pageSize.value
-  const res = await queryUserPostControl({offset})
-  tableData.value = res.info
-  total.value = res.total
+  const types = value.value
+  if (type.value === 1) {
+    const res = await queryUserPostControl({offset, types})
+    tableData.value = res.info
+    total_post.value = res.total
+  } else {
+    const res = await queryUserPostControl({offset, types})
+    userData.value = res.info
+    total_user.value = res.total
+  }
 }
-
+//////////////////////////////////////////////////////////////////
+onMounted(() => getData())
 </script>
 
 <template>
-  <div style="display:flex;align-items: center;flex-direction: column">
+  <el-select v-model="value" placeholder="Select" @change="changeShow" style="margin-bottom: 20px">
+    <el-option-group
+        v-for="group in options"
+        :key="group.label"
+        :label="group.label"
+    >
+      <el-option
+          v-for="item in group.options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+      />
+    </el-option-group>
+  </el-select>
+  <div style="display:flex;align-items: center;flex-direction: column" v-if="type === 1">
     <el-table
-        :data="filterTableData"
+        :data="tableData"
         style="width: 100%"
         ref="tableRef"
         :default-sort="{ prop: 'date', order: 'descending' }"
@@ -58,15 +156,13 @@ const handleCurrentChange = async (val) => {
     >
       <el-table-column type="selection" width="55"/>
       <el-table-column label="日期" sortable prop="date"/>
+      <el-table-column label="作者" prop="username"/>
       <el-table-column label="标题" prop="title"/>
       <el-table-column label="内容" prop="content" :show-overflow-tooltip='true'/>
       <el-table-column label="评论量" sortable prop="commentCount"/>
       <el-table-column label="点赞量" sortable prop="likeCount"/>
       <el-table-column label="收藏量" sortable prop="collectCount"/>
-      <el-table-column align="center">
-        <template #header>
-          <el-input v-model="search" size="small" placeholder="搜索标题..."/>
-        </template>
+      <el-table-column align="center" label="操作">
         <template #default="scope">
           <el-button
               size="small"
@@ -87,7 +183,52 @@ const handleCurrentChange = async (val) => {
           v-model:page-size="pageSize"
           :background="true"
           layout="prev, pager, next, jumper"
-          :total="total"
+          :total="total_post"
+          @current-change="handleCurrentChange"
+      />
+    </div>
+  </div>
+  <div style="display:flex;align-items: center;flex-direction: column" v-else>
+    <el-table
+        :data="userData"
+        style="width: 100%"
+        ref="tableRef"
+        @selection-change="handleSelectionChange"
+        border
+        stripe
+    >
+      <el-table-column type="selection" width="55"/>
+      <el-table-column align="center" label="头像">
+        <template #default="scope">
+          <el-avatar :src="scope.row.avatar"></el-avatar>
+        </template>
+      </el-table-column>
+      <el-table-column label="用户名" sortable prop="username" :show-overflow-tooltip='true'/>
+      <el-table-column label="粉丝量" prop="fans"/>
+      <el-table-column label="关注量" prop="follow"/>
+      <el-table-column label="笔记数" prop="note"/>
+      <el-table-column align="center" label="操作">
+        <template #default="scope">
+          <el-button
+              size="small"
+              type="danger"
+              @click="handleDelete(scope.$index, scope.row)">
+            移除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <div style="margin-top: 20px" v-show="multipleSelection.length !== 0">
+      <el-button @click="toggleSelection()">选中删除</el-button>
+      <el-button @click="tableRef.clearSelection()">清空全选</el-button>
+    </div>
+    <div class="pageArea">
+      <el-pagination
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
+          :background="true"
+          layout="prev, pager, next, jumper"
+          :total="total_user"
           @current-change="handleCurrentChange"
       />
     </div>

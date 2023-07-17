@@ -151,12 +151,13 @@ export const getComment = ({id, offset}) => {
     })
 }
 
-export const queryUserPostControl = ({offset}) => {
+export const queryUserPostControl = ({offset, types}) => {
     return http({
         url: '/user/post/control/',
         method: 'POST',
         data: {
-            offset
+            offset,
+            types
         }
     })
 }
@@ -164,6 +165,16 @@ export const queryUserPostControl = ({offset}) => {
 export const postDelete = ({id}) => {
     return http({
         url: '/post/delete/',
+        method: 'POST',
+        data: {
+            id
+        }
+    })
+}
+
+export const removeFan = ({id}) => {
+    return http({
+        url: '/user/remove/fan/',
         method: 'POST',
         data: {
             id
