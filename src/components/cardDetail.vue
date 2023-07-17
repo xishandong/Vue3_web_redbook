@@ -77,12 +77,14 @@ const content = ref('')
 const to = ref(0)
 const commentInput = ref(null)
 const sendComment = async (post, to) => {
-  const info = [{
-      user: userStore.userInfo,
-      content: content.value,
-      createTime: getCurrentTime(),
-      replyCount: 0
-    }]
+  const info = ref([{
+    id: 0,
+    user: userStore.userInfo,
+    content: content.value,
+    createTime: getCurrentTime(),
+    replyCount: 0,
+    replies: []
+  }])
   if (to === 0 || to === '0') {
     const data = {
       post_id: post.id,
@@ -90,7 +92,9 @@ const sendComment = async (post, to) => {
     }
     const res = await doComment({data})
     ElMessage({type: 'success', message: res.info})
-    comments.value = [...comments.value, ...info]
+    info.value[0].id = res.id
+    console.log(res.id, info.value)
+    comments.value = [...comments.value, ...info.value]
   } else {
     const data = {
       post_id: post.id,
@@ -100,7 +104,7 @@ const sendComment = async (post, to) => {
     const res = await doComment({data})
     ElMessage({type: 'success', message: res.info})
     const comment = comments.value.find(item => item.id === to);
-    comment.replies = [...comment.replies, ...info]
+    comment.replies = [...comment.replies, ...info.value]
     clearReply()
   }
   emit('afterDoComment')
@@ -108,6 +112,7 @@ const sendComment = async (post, to) => {
 }
 const commentMain = (item) => {
   to.value = item.id
+  console.log(item)
   const toPeople = item.user.username
   commentInput.value.input.placeholder = `回复${toPeople}: `
 }
