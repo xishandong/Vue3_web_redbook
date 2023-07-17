@@ -57,10 +57,9 @@ const changeShow = async () => {
   const valueType = value.value;
   const offset = 0;
   const types = valueType;
-
+  const data = tableStore.retrieveData(valueType, 1);
   if (type.value === 1) {
-    if (tableStore.checkExists(valueType, 1)) {
-      const data = tableStore.retrieveData(valueType, 1);
+    if (data) {
       tableData.value = data.data;
       total_post.value = data.total;
     } else {
@@ -70,8 +69,7 @@ const changeShow = async () => {
       tableStore.storeMessage(types, currentPage.value, res.info, res.total);
     }
   } else {
-    if (tableStore.checkExists(valueType, 1)) {
-      const data = tableStore.retrieveData(valueType, 1);
+    if (data) {
       userData.value = data.data;
       total_user.value = data.total;
     } else {
@@ -138,9 +136,10 @@ const total_user = ref(0)
 const handleCurrentChange = async (val) => {
   const offset = (val - 1) * pageSize.value;
   const types = value.value;
+  const cachedData = tableStore.retrieveData(types, val);
   let data, total;
   if (type.value === 1) {
-    if (tableStore.checkExists(types, val)) {
+    if (cachedData) {
       const cachedData = tableStore.retrieveData(types, val);
       data = cachedData.data;
       total = cachedData.total;
@@ -153,7 +152,7 @@ const handleCurrentChange = async (val) => {
     tableData.value = data;
     total_post.value = total;
   } else {
-    if (tableStore.checkExists(types, val)) {
+    if (cachedData) {
       const cachedData = tableStore.retrieveData(types, val);
       data = cachedData.data;
       total = cachedData.total;
