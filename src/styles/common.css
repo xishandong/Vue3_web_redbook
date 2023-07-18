@@ -23,3 +23,7 @@ body {
 .el-popover.el-popper {
     z-index: 99999 !important;
 }
+
+.el-badge__content {
+    font-style: italic !important;
+}

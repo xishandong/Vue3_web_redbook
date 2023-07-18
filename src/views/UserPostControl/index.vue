@@ -165,27 +165,38 @@ const handleCurrentChange = async (val) => {
     total_user.value = total;
   }
 };
-
 //////////////////////////////////////////////////////////////////
 onMounted(() => getData())
 </script>
 
 <template>
   <el-config-provider :locale="locale">
-    <el-select v-model="value" placeholder="Select" @change="changeShow" style="margin-bottom: 20px">
-      <el-option-group
-          v-for="group in options"
-          :key="group.label"
-          :label="group.label"
-      >
-        <el-option
-            v-for="item in group.options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-        />
-      </el-option-group>
-    </el-select>
+    <el-tooltip
+        placement="right-start"
+        effect="light"
+    >
+      <template #content>
+        <h2 style="color:red;">表格内容会缓存到本地</h2>
+        <p>如果进行<span style="color:#fa2e2e;">修改数据</span>没有更新<span style="color:#fa2e2e;">刷新就可以了</span>
+        </p>
+      </template>
+      <el-badge value="i" type="primary">
+        <el-select v-model="value" placeholder="Select" @change="changeShow" style="margin-bottom: 20px">
+          <el-option-group
+              v-for="group in options"
+              :key="group.label"
+              :label="group.label"
+          >
+            <el-option
+                v-for="item in group.options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+            />
+          </el-option-group>
+        </el-select>
+      </el-badge>
+    </el-tooltip>
     <div style="display:flex;align-items: center;flex-direction: column" v-if="type === 1">
       <el-table
           :data="tableData"
@@ -281,6 +292,7 @@ onMounted(() => getData())
 <style scoped>
 .pageArea {
   margin-top: 20px;
-
 }
+
+
 </style>
