@@ -90,10 +90,16 @@ const tableRef = ref(null)
 const getData = async () => {
   const offset = 0
   const types = value.value
-  const res = await queryUserPostControl({offset, types})
-  tableData.value = res.info
-  total_post.value = res.total
-  tableStore.storeMessage(types, 1, res.info, res.total)
+  const data = tableStore.retrieveData(types, 1);
+  if (data) {
+    tableData.value = data.data;
+    total_post.value = data.total;
+  } else {
+    const res = await queryUserPostControl({offset, types})
+    tableData.value = res.info
+    total_post.value = res.total
+    tableStore.storeMessage(types, 1, res.info, res.total)
+  }
 }
 const handleSelectionChange = (val) => {
   multipleSelection.value = val
