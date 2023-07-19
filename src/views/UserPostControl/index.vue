@@ -186,7 +186,7 @@ onMounted(() => getData())
         <p>如果进行<span style="color:#fa2e2e;">修改数据</span>没有更新<span style="color:#fa2e2e;">刷新就可以了</span>
         </p>
       </template>
-      <el-badge value="i" type="primary">
+      <el-badge value="i" type="primary" class="item">
         <el-select v-model="value" placeholder="Select" @change="changeShow" style="margin-bottom: 20px">
           <el-option-group
               v-for="group in options"
@@ -233,8 +233,8 @@ onMounted(() => getData())
         </el-table-column>
       </el-table>
       <div style="margin-top: 20px" v-show="multipleSelection.length !== 0">
-        <el-button @click="toggleSelection()">选中删除</el-button>
-        <el-button @click="tableRef.clearSelection()">清空全选</el-button>
+        <el-button disabled round>选中删除</el-button>
+        <el-button @click="tableRef.clearSelection()" round>清空全选</el-button>
       </div>
       <div class="pageArea">
         <el-pagination
@@ -278,8 +278,8 @@ onMounted(() => getData())
         </el-table-column>
       </el-table>
       <div style="margin-top: 20px" v-show="multipleSelection.length !== 0">
-        <el-button @click="toggleSelection()">选中删除</el-button>
-        <el-button @click="tableRef.clearSelection()">清空全选</el-button>
+        <el-button disabled round>选中删除</el-button>
+        <el-button @click="tableRef.clearSelection()" round>清空全选</el-button>
       </div>
       <div class="pageArea">
         <el-pagination
@@ -299,6 +299,9 @@ onMounted(() => getData())
 .pageArea {
   margin-top: 20px;
 }
-
+.item {
+  margin-top: 10px;
+  margin-right: 40px;
+}
 
 </style>

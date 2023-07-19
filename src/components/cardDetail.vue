@@ -283,7 +283,7 @@ onMounted(() => load())
             </div>
             <el-input
                 v-model="content" class="comment-input" type="text" placeholder="说点什么..." ref="commentInput"
-                :prefix-icon="Edit" @keyup.enter="sendComment(detail, to)" clearable
+                :prefix-icon="Edit" @keyup.enter="sendComment(detail, to)" clearable style="margin-top: 5px"
             />
           </div>
         </el-col>

@@ -229,7 +229,7 @@ const toggleForm = () => {
 .box {
   box-shadow: 32px 18px 21px -3px rgba(0, 0, 0, 0.1);
   width: 50rem;
-  height: 33rem;
+  height: 35rem;
   border-radius: 4rem;
   background-color: transparent;
   border-color: #f3f4f6;
