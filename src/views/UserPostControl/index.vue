@@ -1,10 +1,11 @@
-<script setup>
+<script setup xmlns="http://www.w3.org/1999/html">
 import {computed, onMounted, ref} from 'vue'
 import {queryUserPostControl, postDelete, controlUserCollectOrLike, unFollow, removeFan} from "@/apis/main";
 import {ElMessage} from 'element-plus'
 import {useUserStore} from "@/stores/user";
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import {useTableStore} from "@/utils/tableStore";
+import {InfoFilled} from "@element-plus/icons-vue";
 
 // 配置全局语言和表格缓存//////////////////////////////////////////////
 const locale = zhCn
@@ -177,32 +178,41 @@ onMounted(() => getData())
 
 <template>
   <el-config-provider :locale="locale">
-    <el-tooltip
-        placement="right-start"
-        effect="light"
+
+    <el-select
+        v-model="value"
+        placeholder="Select"
+        @change="changeShow"
+        style="margin-bottom: 20px"
     >
-      <template #content>
-        <h2 style="color:red;">表格内容会缓存到本地</h2>
-        <p>如果进行<span style="color:#fa2e2e;">修改数据</span>没有更新<span style="color:#fa2e2e;">刷新就可以了</span>
-        </p>
+      <template #prefix>
+        <el-tooltip
+            placement="top"
+            effect="light"
+        >
+          <template #content>
+            <el-text tag="b" size="large" type="primary">表格内容会缓存到本地</el-text><br><br>
+            <el-text>如果进行<el-text type="danger">修改数据</el-text>没有更新<el-text type="danger">刷新就可以了</el-text>
+            </el-text>
+          </template>
+          <el-icon>
+            <info-filled/>
+          </el-icon>
+        </el-tooltip>
       </template>
-      <el-badge value="i" type="primary" class="item">
-        <el-select v-model="value" placeholder="Select" @change="changeShow" style="margin-bottom: 20px">
-          <el-option-group
-              v-for="group in options"
-              :key="group.label"
-              :label="group.label"
-          >
-            <el-option
-                v-for="item in group.options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-            />
-          </el-option-group>
-        </el-select>
-      </el-badge>
-    </el-tooltip>
+      <el-option-group
+          v-for="group in options"
+          :key="group.label"
+          :label="group.label"
+      >
+        <el-option
+            v-for="item in group.options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+        />
+      </el-option-group>
+    </el-select>
     <div style="display:flex;align-items: center;flex-direction: column" v-if="type === 1">
       <el-table
           :data="tableData"
@@ -299,6 +309,7 @@ onMounted(() => getData())
 .pageArea {
   margin-top: 20px;
 }
+
 .item {
   margin-top: 10px;
   margin-right: 40px;
