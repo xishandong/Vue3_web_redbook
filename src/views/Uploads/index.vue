@@ -201,7 +201,7 @@ const empty = []
         <Back/>
       </el-icon>
     </button>
-    <card-detail :detail="postData" :comments="empty"/>
+    <card-detail :detail="postData" :comments="empty" :review="true"/>
   </div>
 </template>
 
