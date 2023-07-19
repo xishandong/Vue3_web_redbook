@@ -22,7 +22,7 @@ const searchThings = () => {
            alt="">
     </el-col>
     <el-col :span="16" style="margin-top: 15px;">
-      <el-input v-model="searchInput" placeholder="搜索点什么...." @keyup.enter="searchThings" :prefix-icon="Search"
+      <el-input class="my" v-model="searchInput" placeholder="搜索点什么...." @keyup.enter="searchThings" :prefix-icon="Search"
                 clearable/>
     </el-col>
     <el-col :span="2" :offset="2" style="margin-top: 10px;">

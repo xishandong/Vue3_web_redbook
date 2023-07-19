@@ -256,10 +256,10 @@ const doUpdate = async () => {
       <el-form :model="form" ref="formRef" :rules="rules" label-position="top">
         <el-form-item prop="username" label="昵称" label-width="100px" style="margin: 30px;">
           <el-input v-model="form.username" maxlength="6"
-                    show-word-limit/>
+                    show-word-limit class="my"/>
         </el-form-item>
         <el-form-item prop="signature" label="个性签名" label-width="100px" style="margin: 30px;">
-          <el-input v-model="form.signature"/>
+          <el-input v-model="form.signature" class="my"/>
         </el-form-item>
       </el-form>
     </div>
