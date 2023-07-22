@@ -62,6 +62,7 @@ onMounted(async () => {
 
 const overlay = ref(null)
 onClickOutside(overlay, () => {
+  window.history.pushState({}, "", "/");
   show.value = false;
 });
 </script>

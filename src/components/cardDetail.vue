@@ -179,13 +179,7 @@ onMounted(() => load())
                 <el-avatar :src="detail.user.avatar" size="large"/>
               </a>
               <div class="username">{{ detail.user.username }}</div>
-              <el-popconfirm @confirm="cancelFocusOn(detail.user.id)" title="确认取消关注吗?" confirm-button-text="确认"
-                             v-if="checkFollow(detail.user.id)"
-                             cancel-button-text="取消">
-                <template #reference>
-                  <button class="focusOn">已关注</button>
-                </template>
-              </el-popconfirm>
+              <button @click="cancelFocusOn(detail.user.id)" class="focusOn" v-if="checkFollow(detail.user.id)">已关注</button>
               <button class="focusOn" v-else @click="doFocusOn(detail.user.id)">关注</button>
             </el-row>
             <!-- 卡片头部结束 -->
