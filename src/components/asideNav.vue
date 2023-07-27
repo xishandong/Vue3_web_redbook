@@ -319,8 +319,8 @@ const doUpdate = async () => {
 .menu {
   position: absolute;
   width: 60px;
-  height: 700px;
-  background-color: #dedbdb;
+  height: auto;
+  background-color: #f6f3f3;
   z-index: 2;
   top: 65px;
   bottom: 0;

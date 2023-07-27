@@ -7,6 +7,7 @@ import {queryPost} from "@/apis/main";
 import {useRoute} from "vue-router";
 import {controlDetail} from "@/stores/controlDetail";
 import {onClickOutside} from '@vueuse/core';
+import {resizeWaterFall, waterFallInit, waterFallMore} from "@/utils/waterFall";
 
 const query = useRoute().query.query
 const Details = controlDetail()
@@ -14,10 +15,16 @@ const Details = controlDetail()
 // 主页卡片 //////////////////////////////////////////////////////////////////
 const cards = ref([]);
 const disabled = ref(true); // 初始禁用滚动加载
+
+const columns = ref(0)
+const card_columns = ref({})
+const arrHeight = ref([])
+
 // 主页获取帖子
 const doQuery = async (offset) => {
   const res = await queryPost({offset, query});
   cards.value = res.info;
+  waterFallInit(columns, card_columns, arrHeight, cards)
   disabled.value = false; // 启用滚动加载
 };
 // 无限滚动
@@ -30,6 +37,7 @@ const load = async () => {
     disabled.value = true; // 没有更多数据，禁用滚动加载
   } else {
     cards.value = [...cards.value, ...more];
+    waterFallMore(arrHeight, card_columns, more)
     disabled.value = false;
   }
 };
@@ -58,6 +66,7 @@ const close = () => {
 
 onMounted(async () => {
   await doQuery(0);
+  resizeWaterFall(columns, card_columns, arrHeight, cards)
 });
 
 const overlay = ref(null)
@@ -72,8 +81,8 @@ onClickOutside(overlay, () => {
     <el-empty description="没有帖子..."/>
   </div>
   <div v-else>
-    <div class="container" v-infinite-scroll="load" :infinite-scroll-disabled="disabled">
-      <home-card :cards="cards" @show-detail="showMessage"></home-card>
+    <div v-infinite-scroll="load" :infinite-scroll-disabled="disabled">
+      <home-card :card_columns="card_columns" @show-detail="showMessage" ref="homeCardRef"></home-card>
     </div>
     <transition name="fade">
       <div class="overlay" v-if="show" :style="{ transformOrigin: `${overlayX}px ${overlayY}px` }">
@@ -92,11 +101,6 @@ onClickOutside(overlay, () => {
 <style scoped>
 .Empty {
   margin-top: 10%;
-}
-
-.container {
-  column-count: 5; /* 设置列数，可以根据需要调整列数 */
-  column-gap: 20px; /* 设置列之间的间隔为20px */
 }
 
 .overlay {

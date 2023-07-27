@@ -11,7 +11,7 @@
       <el-aside width="80px">
         <aside-nav/>
       </el-aside>
-      <el-main class="maxSize">
+      <el-main class="maxSize" id="content">
         <RouterView :key="$route.fullPath"/>
       </el-main>
     </el-container>

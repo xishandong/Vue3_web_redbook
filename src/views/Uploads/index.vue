@@ -45,7 +45,6 @@ const onError = async (error) => {
 const handleChange = (uploadFile, uploadFiles) => {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif']; // 可接受的图片类型
   const maxSize = 2; // 最大文件大小，单位：MB
-
   if (!allowedTypes.includes(uploadFile.raw.type)) {
     ElMessage.error('请上传正确的图片文件!');
     upload.value.handleRemove(uploadFile);

@@ -323,7 +323,7 @@ onMounted(() => load())
   border-radius: 0.8rem;
   width: 1200px;
   height: 600px;
-  margin-top: 40px;
+  margin-top: 5px;
 }
 
 .banner {

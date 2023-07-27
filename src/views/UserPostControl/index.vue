@@ -10,7 +10,7 @@ import {InfoFilled} from "@element-plus/icons-vue";
 // 配置全局语言和表格缓存//////////////////////////////////////////////
 const locale = zhCn
 const tableStore = useTableStore();
-
+const loading = ref(true)
 // 控制选择器 /////////////////////////////////////////////////////
 const value = ref('posts')
 const options = [
@@ -63,20 +63,24 @@ const changeShow = async () => {
       tableData.value = data.data;
       total_post.value = data.total;
     } else {
+      loading.value = true
       const res = await queryUserPostControl({offset, types});
       tableData.value = res.info;
       total_post.value = res.total;
       tableStore.storeMessage(types, 1, res.info, res.total);
+      loading.value = false
     }
   } else {
     if (data) {
       userData.value = data.data;
       total_user.value = data.total;
     } else {
+      loading.value = true
       const res = await queryUserPostControl({offset, types});
       userData.value = res.info;
       total_user.value = res.total;
       tableStore.storeMessage(types, 1, res.info, res.total);
+      loading.value = false
     }
   }
   currentPage.value = 1;
@@ -95,11 +99,14 @@ const getData = async () => {
   if (data) {
     tableData.value = data.data;
     total_post.value = data.total;
+    loading.value = false
   } else {
+    loading.value = true
     const res = await queryUserPostControl({offset, types})
     tableData.value = res.info
     total_post.value = res.total
     tableStore.storeMessage(types, 1, res.info, res.total)
+    loading.value = false
   }
 }
 const handleSelectionChange = (val) => {
@@ -108,6 +115,7 @@ const handleSelectionChange = (val) => {
 const handleDelete = async (index, row) => {
   const id = row.id
   if (type.value === 1) {
+    tableData.value.splice(index, 1)
     if (value.value === 'posts') {
       const res = await postDelete({id})
       ElMessage({type: 'success', message: res.success})
@@ -118,8 +126,8 @@ const handleDelete = async (index, row) => {
       const res = await controlUserCollectOrLike({post_id, operator, type})
       ElMessage({type: 'success', message: res.info})
     }
-    tableData.value.splice(index, 1)
   } else {
+    userData.value.splice(index, 1)
     if (value.value === 'fans') {
       const res = await removeFan({id})
       ElMessage({type: 'success', message: res.info})
@@ -129,7 +137,6 @@ const handleDelete = async (index, row) => {
       userStore.removeFocus(1, id)
       ElMessage({type: 'success', message: res.info})
     }
-    userData.value.splice(index, 1)
   }
 }
 ////////////////////////////////////////////////////////////////
@@ -150,10 +157,12 @@ const handleCurrentChange = async (val) => {
       data = cachedData.data;
       total = cachedData.total;
     } else {
+      loading.value = true
       const res = await queryUserPostControl({offset, types});
       data = res.info;
       total = res.total;
       tableStore.storeMessage(types, val, data, total);
+      loading.value = false
     }
     tableData.value = data;
     total_post.value = total;
@@ -163,10 +172,12 @@ const handleCurrentChange = async (val) => {
       data = cachedData.data;
       total = cachedData.total;
     } else {
+      loading.value = true
       const res = await queryUserPostControl({offset, types});
       data = res.info;
       total = res.total;
       tableStore.storeMessage(types, val, data, total);
+      loading.value = false
     }
     userData.value = data;
     total_user.value = total;
@@ -220,6 +231,7 @@ onMounted(() => getData())
           ref="tableRef"
           :default-sort="{ prop: 'date', order: 'descending' }"
           @selection-change="handleSelectionChange"
+          v-loading="loading"
           border
           stripe
       >
@@ -264,6 +276,7 @@ onMounted(() => getData())
           ref="tableRef"
           @selection-change="handleSelectionChange"
           border
+          v-loading="loading"
           stripe
       >
         <el-table-column type="selection" width="55"/>

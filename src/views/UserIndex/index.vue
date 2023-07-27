@@ -7,6 +7,7 @@ import {Back} from "@element-plus/icons-vue";
 import {queryUserIndex, queryUserPost} from "@/apis/main";
 import {controlDetail} from "@/stores/controlDetail";
 import {onClickOutside} from "@vueuse/core";
+import {resizeWaterFall, waterFallInit, waterFallMore} from "@/utils/waterFall";
 
 const route = useRoute()
 const Details = controlDetail()
@@ -26,6 +27,14 @@ const userPost = ref([])
 const userCollect = ref([])
 const userFavorite = ref([])
 const disabled = ref(true); // 初始禁用滚动加载
+
+const columns = ref(0)
+const card_columns_posts = ref({})
+const card_columns_like = ref({})
+const card_columns_collect = ref({})
+const arrHeight = ref([])
+
+
 const Toggle = async () => {
   const user_id = route.params.id
   const offset = 0
@@ -33,12 +42,15 @@ const Toggle = async () => {
   if (radio.value === '帖子' && userPost.value.length === 0) {
     const post = await queryUserPost({user_id, types, offset})
     userPost.value = post.info
+    waterFallInit(columns, card_columns_posts, arrHeight, userPost)
   } else if (radio.value === '收藏' && userCollect.value.length === 0) {
     const post = await queryUserPost({user_id, types, offset})
     userCollect.value = post.info
+    waterFallInit(columns, card_columns_collect, arrHeight, userCollect)
   } else if (radio.value === '点赞' && userFavorite.value.length === 0) {
     const post = await queryUserPost({user_id, types, offset})
     userFavorite.value = post.info
+    waterFallInit(columns, card_columns_like, arrHeight, userFavorite)
   }
   disabled.value = false;
 }
@@ -53,6 +65,7 @@ const load = async () => {
       disabled.value = true;
     } else {
       userPost.value = [...userPost.value, ...post.info];
+      waterFallMore(arrHeight, card_columns_posts, post.info)
       disabled.value = false;
     }
   } else if (types === '点赞') {
@@ -62,6 +75,7 @@ const load = async () => {
       disabled.value = true;
     } else {
       userFavorite.value = [...userFavorite.value, ...like.info];
+      waterFallMore(arrHeight, card_columns_like, like.info)
       disabled.value = false;
     }
   } else if (types === '收藏') {
@@ -71,6 +85,7 @@ const load = async () => {
       disabled.value = true;
     } else {
       userCollect.value = [...userCollect.value, ...collect.info];
+      waterFallMore(arrHeight, card_columns_collect, collect.info)
       disabled.value = false;
     }
   }
@@ -92,16 +107,24 @@ const showMessage = async (id) => {
   show.value = true
 }
 const afterDoComment = (comment) => Details.afterDoComment(comment)
-const setComment = (data) => Details.SetComment(data)
 const close = () => {
   window.history.pushState({}, '', `/user/index/${userInfo.value.user.id}`);
   show.value = false
 }
 // 卡片详情页的内容结束 //////////////////////////////////////////////////////////
-
+const resize = () => {
+  if (radio.value === '帖子') {
+    resizeWaterFall(columns, card_columns_posts, arrHeight, userPost)
+  } else if (radio.value === '收藏') {
+    resizeWaterFall(columns, card_columns_collect, arrHeight, userCollect)
+  } else if (radio.value === '点赞') {
+    resizeWaterFall(columns, card_columns_like, arrHeight, userFavorite)
+  }
+}
 onMounted(async () => {
   await getUserInfo()
   await Toggle()
+  resize()
 })
 
 const overlay = ref(null)
@@ -140,9 +163,9 @@ onClickOutside(overlay, () => {
       <div v-if="userPost.length === 0">
         <el-empty description="现在还没有帖子..."/>
       </div>
-      <div class="container" v-infinite-scroll="load" :infinite-scroll-disabled="disabled" infinite-scroll-distance="0"
+      <div v-infinite-scroll="load" :infinite-scroll-disabled="disabled" infinite-scroll-distance="0"
            v-else>
-        <home-card :cards="userPost" @show-detail="showMessage"></home-card>
+        <home-card :card_columns="card_columns_posts" @show-detail="showMessage"></home-card>
       </div>
       <transition name="fade">
         <div class="overlay" v-if="show" :style="{ transformOrigin: `${overlayX}px ${overlayY}px` }">
@@ -159,9 +182,9 @@ onClickOutside(overlay, () => {
       <div v-if="userCollect.length === 0">
         <el-empty description="现在还没有收藏..."/>
       </div>
-      <div class="container" v-infinite-scroll="load" :infinite-scroll-disabled="disabled" infinite-scroll-distance="0"
+      <div v-infinite-scroll="load" :infinite-scroll-disabled="disabled" infinite-scroll-distance="0"
            v-else>
-        <home-card :cards="userCollect" ref="overlay" @show-detail="showMessage"></home-card>
+        <home-card :card_columns="card_columns_collect" ref="overlay" @show-detail="showMessage"></home-card>
       </div>
       <transition name="fade">
         <div class="overlay" v-if="show" :style="{ transformOrigin: `${overlayX}px ${overlayY}px` }">
@@ -178,9 +201,9 @@ onClickOutside(overlay, () => {
       <div v-if="userFavorite.length === 0">
         <el-empty description="现在还没有点赞..."/>
       </div>
-      <div class="container" v-infinite-scroll="load" :infinite-scroll-disabled="disabled" infinite-scroll-distance="0"
+      <div v-infinite-scroll="load" :infinite-scroll-disabled="disabled" infinite-scroll-distance="0"
            v-else>
-        <home-card :cards="userFavorite" @show-detail="showMessage"></home-card>
+        <home-card :card_columns="card_columns_like" @show-detail="showMessage"></home-card>
       </div>
       <transition name="fade">
         <div class="overlay" v-if="show" :style="{ transformOrigin: `${overlayX}px ${overlayY}px` }">
@@ -197,11 +220,6 @@ onClickOutside(overlay, () => {
 </template>
 
 <style scoped>
-.container {
-  column-count: 5; /* 设置列数，可以根据需要调整列数 */
-  column-gap: 20px; /* 设置列之间的间隔为20px */
-}
-
 .userInfo {
   position: relative;
   width: 500px;
