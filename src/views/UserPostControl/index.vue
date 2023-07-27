@@ -4,7 +4,7 @@ import {queryUserPostControl, postDelete, controlUserCollectOrLike, unFollow, re
 import {ElMessage} from 'element-plus'
 import {useUserStore} from "@/stores/user";
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
-import {useTableStore} from "@/utils/tableStore";
+import {useTableStore} from "@/stores/tableStore";
 import {InfoFilled} from "@element-plus/icons-vue";
 
 // 配置全局语言和表格缓存//////////////////////////////////////////////
