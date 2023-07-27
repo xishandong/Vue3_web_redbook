@@ -1,12 +1,19 @@
 <script setup>
+import {ref} from "vue";
+
 const props = defineProps({
   card_columns: {
-    default: () => {}
+    default: () => {
+    }
   }
 })
 const emit = defineEmits(['show-detail'])
 const details = (id) => {
   emit('show-detail', id)
+}
+const ok = ref(false)
+const handleLoad = (card) => {
+  card.load = true
 }
 </script>
 
@@ -14,11 +21,12 @@ const details = (id) => {
   <div class="col">
     <div v-for="col in card_columns">
       <section v-for="card in col" :key="card.id">
-        <el-card :body-style="{ padding: '0px' }" shadow="hover" class="card">
+        <el-card v-show="card.load" :body-style="{ padding: '0px' }" shadow="hover" class="card">
           <a :href="`/explore/${card.id}`" @click.prevent="details(card.id)">
             <img
                 :src="card.img"
                 class="image"
+                @load="handleLoad(card)"
                 alt=""
             />
           </a>
@@ -38,6 +46,25 @@ const details = (id) => {
             </div>
           </div>
         </el-card>
+        <div v-if="!card.load">
+          <div class="card loading">
+            <div class="image" :style="{height: card.img_info.height / (card.img_info.width / 250) + 'px'}">
+            </div>
+            <div style="padding: 10px">
+            <div style="margin-bottom: 10px;height: 20px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
+              <span style="font-size: 1.0rem;" @click="details(card.id)">{{ card.title }}</span>
+            </div>
+            <div class="bottom">
+              <el-row style="align-items: center;">
+                <a :href="`/user/index/${card.user.id}`">
+                  <div class="avatar"></div>
+                </a>
+                <div class="username">{{ card.user.username }}</div>
+              </el-row>
+            </div>
+          </div>
+          </div>
+        </div>
       </section>
     </div>
   </div>
@@ -48,6 +75,31 @@ const details = (id) => {
   display: flex;
   flex-direction: row;
   justify-content: center;
+}
+
+.loading .image,
+.loading .avatar {
+  background: gainsboro linear-gradient(
+      100deg,
+      rgba(255, 255, 255, 0) 40%,
+      rgba(255, 255, 255, .5) 50%,
+      rgba(255, 255, 255, 0) 60%
+  );
+  background-size: 200% 100%;
+  background-position-x: 180%;
+  animation: 1s loading ease-in-out infinite;
+}
+
+@keyframes loading {
+  to {
+    background-position-x: -20%;
+  }
+}
+
+.loading .avatar {
+  border-radius: 50%;
+  height: 24px;
+  width: 24px;
 }
 
 section {
