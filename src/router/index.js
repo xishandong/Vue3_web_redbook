@@ -79,7 +79,7 @@ router.beforeEach((to, from, next) => {
     const userInfo = userStore.userInfo;
 
     // 根据用户信息动态设置网页标题
-    if (userInfo && meta.title) {
+    if (userInfo.username && meta.title) {
         meta.title = `${userInfo.username} - ${meta.title}`;
     }
     // 继续导航
