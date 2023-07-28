@@ -1,12 +1,22 @@
 <script setup xmlns="http://www.w3.org/1999/html">
-import {computed, onMounted, ref} from 'vue'
+import {computed, onBeforeMount, onMounted, ref} from 'vue'
 import {queryUserPostControl, postDelete, controlUserCollectOrLike, unFollow, removeFan} from "@/apis/main";
 import {ElMessage} from 'element-plus'
 import {useUserStore} from "@/stores/user";
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import {useTableStore} from "@/stores/tableStore";
 import {InfoFilled} from "@element-plus/icons-vue";
+import {useRouter} from "vue-router";
 
+const router = useRouter()
+const userStore = useUserStore();
+const checkLogin = () => {
+  if (!userStore.userInfo.id) {
+    router.replace('/login')
+  }
+}
+
+onBeforeMount(() => checkLogin())
 // 配置全局语言和表格缓存//////////////////////////////////////////////
 const locale = zhCn
 const tableStore = useTableStore();
@@ -133,7 +143,6 @@ const handleDelete = async (index, row) => {
       ElMessage({type: 'success', message: res.info})
     } else if (value.value === 'follow') {
       const res = await unFollow({id})
-      const userStore = useUserStore();
       userStore.removeFocus(1, id)
       ElMessage({type: 'success', message: res.info})
     }
@@ -184,7 +193,9 @@ const handleCurrentChange = async (val) => {
   }
 };
 //////////////////////////////////////////////////////////////////
-onMounted(() => getData())
+onMounted(() => {
+  getData()
+})
 </script>
 
 <template>
@@ -202,8 +213,12 @@ onMounted(() => getData())
             effect="light"
         >
           <template #content>
-            <el-text tag="b" size="large" type="primary">表格内容会缓存到本地</el-text><br><br>
-            <el-text>如果进行<el-text type="danger">修改数据</el-text>没有更新<el-text type="danger">刷新就可以了</el-text>
+            <el-text tag="b" size="large" type="primary">表格内容会缓存到本地</el-text>
+            <br><br>
+            <el-text>如果进行
+              <el-text type="danger">修改数据</el-text>
+              没有更新
+              <el-text type="danger">刷新就可以了</el-text>
             </el-text>
           </template>
           <el-icon>

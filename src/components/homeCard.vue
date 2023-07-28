@@ -1,7 +1,7 @@
 <script setup>
 import {ref} from "vue";
 
-const props = defineProps({
+defineProps({
   card_columns: {
     default: () => {
     }
@@ -36,11 +36,11 @@ const handleLoad = (card) => {
             </div>
             <div class="bottom">
               <el-row style="align-items: center;">
-                <a :href="`/user/index/${card.user.id}`">
+                <RouterLink :to="`/user/index/${card.user.id}`">
                   <el-avatar
                       :src="card.user.avatar" size="small"
                   />
-                </a>
+                </RouterLink>
                 <div class="username">{{ card.user.username }}</div>
               </el-row>
             </div>
@@ -56,9 +56,9 @@ const handleLoad = (card) => {
             </div>
             <div class="bottom">
               <el-row style="align-items: center;">
-                <a :href="`/user/index/${card.user.id}`">
+                <RouterLink :to="`/user/index/${card.user.id}`">
                   <div class="avatar"></div>
-                </a>
+                </RouterLink>
                 <div class="username">{{ card.user.username }}</div>
               </el-row>
             </div>

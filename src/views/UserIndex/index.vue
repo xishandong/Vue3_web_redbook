@@ -18,6 +18,7 @@ const getUserInfo = async () => {
   const id = route.params.id
   const res = await queryUserIndex({id})
   userInfo.value = res.data
+  document.title = res.data.user.username + ' .Dlock'
 }
 // 加载用户信息结束 ////////////////////////////////////////////////////////////
 
