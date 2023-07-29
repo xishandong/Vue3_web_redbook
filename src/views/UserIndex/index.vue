@@ -110,6 +110,7 @@ const showMessage = async (id) => {
 const afterDoComment = (comment) => Details.afterDoComment(comment)
 const close = () => {
   window.history.pushState({}, '', `/user/index/${userInfo.value.user.id}`);
+  document.title = userInfo.value.user.username + ' .Dlock'
   show.value = false
 }
 // 卡片详情页的内容结束 //////////////////////////////////////////////////////////
@@ -130,7 +131,8 @@ onMounted(async () => {
 
 const overlay = ref(null)
 onClickOutside(overlay, () => {
-  window.history.pushState({}, "", "/");
+  window.history.pushState({}, "", `/user/index/${userInfo.value.user.id}`);
+  document.title = userInfo.value.user.username + ' .Dlock'
   show.value = false;
 });
 </script>
@@ -164,7 +166,8 @@ onClickOutside(overlay, () => {
       <div v-if="userPost.length === 0">
         <el-empty description="现在还没有帖子..."/>
       </div>
-      <div v-infinite-scroll="load" :infinite-scroll-disabled="disabled" infinite-scroll-distance="0"
+      <div v-infinite-scroll="load" :infinite-scroll-disabled="disabled" :infinite-scroll-delay="200"
+           :infinite-scroll-distance="100"
            v-else>
         <home-card :card_columns="card_columns_posts" @show-detail="showMessage"></home-card>
       </div>
@@ -183,7 +186,8 @@ onClickOutside(overlay, () => {
       <div v-if="userCollect.length === 0">
         <el-empty description="现在还没有收藏..."/>
       </div>
-      <div v-infinite-scroll="load" :infinite-scroll-disabled="disabled" infinite-scroll-distance="0"
+      <div v-infinite-scroll="load" :infinite-scroll-disabled="disabled" :infinite-scroll-delay="200"
+           :infinite-scroll-distance="100"
            v-else>
         <home-card :card_columns="card_columns_collect" ref="overlay" @show-detail="showMessage"></home-card>
       </div>
@@ -202,7 +206,8 @@ onClickOutside(overlay, () => {
       <div v-if="userFavorite.length === 0">
         <el-empty description="现在还没有点赞..."/>
       </div>
-      <div v-infinite-scroll="load" :infinite-scroll-disabled="disabled" infinite-scroll-distance="0"
+      <div v-infinite-scroll="load" :infinite-scroll-disabled="disabled" :infinite-scroll-delay="200"
+           :infinite-scroll-distance="100"
            v-else>
         <home-card :card_columns="card_columns_like" @show-detail="showMessage"></home-card>
       </div>

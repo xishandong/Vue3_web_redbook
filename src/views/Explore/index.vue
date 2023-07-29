@@ -71,7 +71,7 @@ onMounted(async () => {
 
 const overlay = ref(null)
 onClickOutside(overlay, () => {
-  window.history.pushState({}, "", "/");
+  window.history.pushState({}, "", "/explore/${id}");
   show.value = false;
 });
 </script>
@@ -81,7 +81,7 @@ onClickOutside(overlay, () => {
     <el-empty description="没有帖子..."/>
   </div>
   <div v-else>
-    <div v-infinite-scroll="load" :infinite-scroll-disabled="disabled">
+    <div v-infinite-scroll="load" :infinite-scroll-disabled="disabled" :infinite-scroll-delay="200" :infinite-scroll-distance="100">
       <home-card :card_columns="card_columns" @show-detail="showMessage" ref="homeCardRef"></home-card>
     </div>
     <transition name="fade">

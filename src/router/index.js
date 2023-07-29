@@ -64,8 +64,11 @@ const router = createRouter({
             }
         },
         {
-            path: '/NotFound',
-            component: NotFound
+            path: '/:catchAll(.*)',
+            component: NotFound,
+            meta: {
+                title: '你想找什么呢？'
+            }
         }
     ]
 })
