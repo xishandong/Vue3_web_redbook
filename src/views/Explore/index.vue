@@ -71,7 +71,7 @@ onMounted(async () => {
 
 const overlay = ref(null)
 onClickOutside(overlay, () => {
-  window.history.pushState({}, "", "/explore/${id}");
+  window.history.pushState({}, "", "/");
   show.value = false;
 });
 </script>
