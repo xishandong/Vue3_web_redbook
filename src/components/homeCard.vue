@@ -19,7 +19,7 @@ const handleLoad = (card) => {
 
 <template>
   <div class="col">
-    <div v-for="col in card_columns">
+    <div v-for="col in card_columns" :key="card_columns">
       <section v-for="card in col" :key="card.id">
         <el-card v-show="card.load" :body-style="{ padding: '0px' }" shadow="hover" class="card">
           <a :href="`/explore/${card.id}`" @click.prevent="details(card.id)">

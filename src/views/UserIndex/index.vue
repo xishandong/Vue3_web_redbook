@@ -4,13 +4,16 @@ import {onMounted, ref} from "vue";
 import HomeCard from "@/components/homeCard.vue";
 import CardDetail from "@/components/cardDetail.vue";
 import {Back} from "@element-plus/icons-vue";
-import {queryUserIndex, queryUserPost} from "@/apis/main";
+import {doFocus, queryUserIndex, queryUserPost} from "@/apis/main";
 import {controlDetail} from "@/stores/controlDetail";
 import {onClickOutside} from "@vueuse/core";
 import {resizeWaterFall, waterFallInit, waterFallMore} from "@/utils/waterFall";
+import {useUserStore} from "@/stores/user";
+import {ElMessage} from "element-plus";
 
 const route = useRoute()
 const Details = controlDetail()
+const userStore = useUserStore()
 
 // 加载用户信息 //////////////////////////////////////////////////////////////
 const userInfo = ref({})
@@ -19,6 +22,21 @@ const getUserInfo = async () => {
   const res = await queryUserIndex({id})
   userInfo.value = res.data
   document.title = res.data.user.username + ' .Dlock'
+}
+const checkFollow = (id) => {
+  if (userStore.userInfo.id === id) {
+    return true
+  }
+  return userStore.userFocus.includes(id)
+}
+const doFocusOn = async (id) => {
+  if (userStore.userInfo.id === id) {
+    ElMessage({type: 'warning', message: '不能对自己进行关注操作'})
+    return
+  }
+  const res = await doFocus({id})
+  userStore.extendUserInfo(1, id)
+  ElMessage({type: 'success', message: res.info})
 }
 // 加载用户信息结束 ////////////////////////////////////////////////////////////
 
@@ -139,11 +157,11 @@ onClickOutside(overlay, () => {
 
 <template>
   <div class="userInfo" v-if="userInfo.user">
-    <el-row :gutter="20">
-      <el-col :span="10" style="width: 250px;">
+    <el-row :gutter="10">
+      <el-col :span="7" style="width: 250px;">
         <el-avatar :size="150" :src="userInfo.user.avatar"></el-avatar>
       </el-col>
-      <el-col :span="10" style="width: 250px;">
+      <el-col :span="7" style="width: 250px!important;">
         <h2>{{ userInfo.user.username }}</h2>
         <p>{{ userInfo.user.signature }}</p>
         <div class="tagArea">
@@ -151,6 +169,9 @@ onClickOutside(overlay, () => {
           <el-tag class="ml-2" type="info" round>{{ userInfo.user.fans }} 粉丝</el-tag>
           <el-tag class="ml-2" type="warning" round>{{ userInfo.user.postsCount }} 笔记数</el-tag>
         </div>
+      </el-col>
+      <el-col :span="5" style="width: 100px;">
+        <button class="focusOn" v-if="!checkFollow(userInfo.user.id)" @click="doFocusOn(userInfo.user.id)">关注</button>
       </el-col>
     </el-row>
   </div>
@@ -227,9 +248,30 @@ onClickOutside(overlay, () => {
 
 <style scoped>
 .userInfo {
-  position: relative;
-  width: 500px;
-  left: 30%;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.focusOn {
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 40px;
+  line-height: 18px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: red;
+  border-radius: 1000px;
+  color: #fff;
+  border-color: transparent;
+  margin-top: 1rem;
+}
+
+.focusOn:hover {
+  background-color: #fd5656;
 }
 
 .tagArea {
