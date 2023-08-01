@@ -213,13 +213,12 @@ onMounted(() => {
             effect="light"
         >
           <template #content>
-            <el-text tag="b" size="large" type="primary">表格内容会缓存到本地</el-text>
-            <br><br>
-            <el-text>如果进行
-              <el-text type="danger">修改数据</el-text>
+            <h2 style="color:red;">表格内容会缓存到本地</h2>
+            <p>如果进行
+              <span style="color:red;">修改数据</span>
               没有更新
-              <el-text type="danger">刷新就可以了</el-text>
-            </el-text>
+              <span style="color:red;">刷新就可以了</span>
+            </p>
           </template>
           <el-icon>
             <info-filled/>

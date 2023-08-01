@@ -155,12 +155,12 @@ onMounted(() => load())
 
 <template>
   <div class="box" v-if="detail.id">
-    <el-card style="border-radius: 0.8rem;">
+    <div style="border-radius: 0.8rem;background-color:#fff;">
       <el-row :gutter="50">
         <!-- 图片区 -->
         <el-col :span="50">
           <div class="banner">
-            <el-carousel height="600px">
+            <el-carousel height="620px">
               <el-carousel-item v-for="item in detail.imgs" :key="item">
                 <img class="image"
                      :src="item"
@@ -172,14 +172,15 @@ onMounted(() => load())
         <!-- 图片区结束 -->
         <!-- 卡牌详情区 -->
         <el-col :span="50">
-          <div class="info" style="width: 500px;">
+          <div class="info" style="width: 500px;margin-top: 10px;">
             <!-- 卡片头部 -->
             <el-row style="align-items: center;width: 500px;">
               <a :href="`/user/index/${detail.user.id}`">
                 <el-avatar :src="detail.user.avatar" size="large"/>
               </a>
               <div class="username">{{ detail.user.username }}</div>
-              <button @click="cancelFocusOn(detail.user.id)" class="focusOn" v-if="checkFollow(detail.user.id)">已关注</button>
+              <button @click="cancelFocusOn(detail.user.id)" class="focusOn" v-if="checkFollow(detail.user.id)">已关注
+              </button>
               <button class="focusOn" v-else @click="doFocusOn(detail.user.id)">关注</button>
             </el-row>
             <!-- 卡片头部结束 -->
@@ -281,13 +282,14 @@ onMounted(() => load())
             </div>
             <el-input
                 v-model="content" class="comment-input my" type="text" placeholder="说点什么..." ref="commentInput"
-                :prefix-icon="Edit" @keyup.enter="sendComment(detail, to)" clearable style="margin-top: 5px" :disabled="review"
+                :prefix-icon="Edit" @keyup.enter="sendComment(detail, to)" clearable style="margin-top: 5px"
+                :disabled="review"
             />
           </div>
         </el-col>
         <!-- 卡牌详情区结束 -->
       </el-row>
-    </el-card>
+    </div>
   </div>
 </template>
 
@@ -322,8 +324,9 @@ onMounted(() => load())
   top: 40px;
   border-radius: 0.8rem;
   width: 1200px;
-  height: 600px;
+  height: 620px;
   margin-top: 5px;
+  box-shadow: -16px 28px 28px -3px rgba(0, 0, 0, 0.1), 0px 10px 61px -8px rgba(0, 0, 0, 0.1);
 }
 
 .banner {
@@ -351,9 +354,9 @@ onMounted(() => load())
 
 .image {
   width: 600px;
-  height: 600px;
-  border-radius: 0.8rem;
-  object-fit: contain;
+  height: 620px;
+  border-radius: 0.8rem 0 0 0.8rem;
+  object-fit: cover;
 }
 
 .main-content::-webkit-scrollbar {

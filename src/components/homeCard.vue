@@ -12,8 +12,7 @@ const details = (id) => {
   const target = event.target;
   const left = target.x;
   const top = target.y;
-  const height = target.height
-  emit('show-detail', id, left, top, (height + 80) / 600)
+  emit('show-detail', id, left, top)
 }
 const ok = ref(false)
 const handleLoad = (card) => {
@@ -25,7 +24,7 @@ const handleLoad = (card) => {
   <div class="col">
     <div v-for="col in card_columns" :key="col.id">
       <section v-for="card in col" :key="card.id">
-        <el-card v-show="card.load" :body-style="{ padding: '0px' }" shadow="hover" class="card">
+        <div v-show="card.load" style=" padding: 0" class="card">
           <a :href="`/explore/${card.id}`" @click.prevent="details(card.id)">
             <img
                 :src="card.img"
@@ -49,7 +48,7 @@ const handleLoad = (card) => {
               </el-row>
             </div>
           </div>
-        </el-card>
+        </div>
         <div v-if="!card.load">
           <div class="card loading">
             <div class="image" :style="{height: card.img_info.height / (card.img_info.width / 250) + 'px'}">
@@ -121,7 +120,7 @@ section {
 .image {
   width: 250px;
   border-radius: 0.8rem;
-  object-fit: contain;
+  object-fit: fill;
 }
 
 .image:hover {

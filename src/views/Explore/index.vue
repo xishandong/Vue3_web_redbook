@@ -49,14 +49,12 @@ const show = ref(false);
 const overlayX = ref(0); // 覆盖层的水平位置
 const overlayY = ref(0); // 覆盖层的垂直位置
 const overlay = ref(null)
-const cardInitHeight = ref(0)
 
 const getDetails = async (id) => Details.getDetail(id)
-const showMessage = async (id, left, top, height) => {
+const showMessage = async (id, left, top) => {
   window.history.pushState({}, "", `/explore/${id}`);
   overlayX.value = left;
   overlayY.value = top;
-  cardInitHeight.value = height
   await getDetails(id);
   show.value = true;
 };
@@ -78,8 +76,11 @@ const onBeforeEnter = () => {
   style.innerHTML =
       `@keyframes scale-up-center {
           0% {
-            transform: scale(${250 / 1200}, ${cardInitHeight.value});
+            transform: scale(0.5);
             transform-origin: ${overlayX.value}px ${overlayY.value}px;
+          }
+          10% {
+            transform: scale(0.5);
           }
           100% {
             transform: scale(1);
@@ -175,7 +176,7 @@ onMounted(async () => {
 }
 
 .fade-leave-active {
-  animation: scale-up-center 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both reverse;
+  animation: scale-up-center 0.3s ease-out both reverse;
 }
 
 </style>
