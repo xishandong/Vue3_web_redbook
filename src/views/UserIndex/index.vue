@@ -115,21 +115,62 @@ const load = async () => {
 const detail = Details.detail
 const overlayX = ref(0); // 覆盖层的水平位置
 const overlayY = ref(0); // 覆盖层的垂直位置
-// 卡片详情
+const overlay = ref(null)
+const cardInitHeight = ref(0)
 const show = ref(false)
+
 const getDetails = async (id) => Details.getDetail(id)
-const showMessage = async (id) => {
-  window.history.pushState({}, '', `/explore/${id}`);
-  overlayX.value = event.clientX;
-  overlayY.value = event.clientY;
-  await getDetails(id)
-  show.value = true
-}
+const showMessage = async (id, left, top, height) => {
+  window.history.pushState({}, "", `/explore/${id}`);
+  overlayX.value = left;
+  overlayY.value = top;
+  cardInitHeight.value = height
+  await getDetails(id);
+  show.value = true;
+};
 const afterDoComment = (comment) => Details.afterDoComment(comment)
 const close = () => {
   window.history.pushState({}, '', `/user/index/${userInfo.value.user.id}`);
   document.title = userInfo.value.user.username + ' .Dlock'
   show.value = false
+}
+onClickOutside(overlay, () => {
+  window.history.pushState({}, "", `/user/index/${userInfo.value.user.id}`);
+  document.title = userInfo.value.user.username + ' .Dlock'
+  show.value = false;
+});
+let style = null;
+const onBeforeEnter = () => {
+  style = document.createElement('style')
+  style.innerHTML =
+      `@keyframes scale-up-center {
+          0% {
+            transform: scale(${250 / 1200}, ${cardInitHeight.value});
+            transform-origin: ${overlayX.value}px ${overlayY.value}px;
+          }
+          100% {
+            transform: scale(1);
+          }
+       }`
+  document.head.appendChild(style);
+}
+
+const onAfterEnter = (el) => {
+  el.style = 'background-color: #fff'
+  const button = el.querySelector('.backPage')
+  button.style.display = ''
+}
+const onBeforeLeave = (el) => {
+  const button = el.querySelector('.backPage')
+  button.style.display = 'none'
+  el.style = 'background-color: transparent'
+}
+
+const onAfterLeave = () => {
+  if (style) {
+    document.head.removeChild(style);
+    style = null;
+  }
 }
 // 卡片详情页的内容结束 //////////////////////////////////////////////////////////
 const resize = () => {
@@ -146,13 +187,6 @@ onMounted(async () => {
   await Toggle()
   resize()
 })
-
-const overlay = ref(null)
-onClickOutside(overlay, () => {
-  window.history.pushState({}, "", `/user/index/${userInfo.value.user.id}`);
-  document.title = userInfo.value.user.username + ' .Dlock'
-  show.value = false;
-});
 </script>
 
 <template>
@@ -192,9 +226,15 @@ onClickOutside(overlay, () => {
            v-else>
         <home-card :card_columns="card_columns_posts" @show-detail="showMessage"></home-card>
       </div>
-      <transition name="fade">
-        <div class="overlay" v-if="show" :style="{ transformOrigin: `${overlayX}px ${overlayY}px` }">
-          <button class="backPage" @click="close">
+      <transition
+          name="fade"
+          @before-enter="onBeforeEnter"
+          @after-enter="onAfterEnter"
+          @before-leave="onBeforeLeave"
+          @after-leave="onAfterLeave"
+      >
+        <div class="overlay" v-if="show">
+          <button style="display:none;" class="backPage" @click="close">
             <el-icon>
               <Back/>
             </el-icon>
@@ -212,14 +252,20 @@ onClickOutside(overlay, () => {
            v-else>
         <home-card :card_columns="card_columns_collect" ref="overlay" @show-detail="showMessage"></home-card>
       </div>
-      <transition name="fade">
-        <div class="overlay" v-if="show" :style="{ transformOrigin: `${overlayX}px ${overlayY}px` }">
-          <button class="backPage" @click="close">
+      <transition
+          name="fade"
+          @before-enter="onBeforeEnter"
+          @after-enter="onAfterEnter"
+          @before-leave="onBeforeLeave"
+          @after-leave="onAfterLeave"
+      >
+        <div class="overlay" v-if="show">
+          <button style="display:none;" class="backPage" @click="close">
             <el-icon>
               <Back/>
             </el-icon>
           </button>
-          <card-detail :detail="detail" ref="overlay" @afterDoComment="afterDoComment"/>
+          <card-detail :detail="detail" @afterDoComment="afterDoComment" ref="overlay"/>
         </div>
       </transition>
     </div>
@@ -232,14 +278,20 @@ onClickOutside(overlay, () => {
            v-else>
         <home-card :card_columns="card_columns_like" @show-detail="showMessage"></home-card>
       </div>
-      <transition name="fade">
-        <div class="overlay" v-if="show" :style="{ transformOrigin: `${overlayX}px ${overlayY}px` }">
-          <button class="backPage" @click="close">
+      <transition
+          name="fade"
+          @before-enter="onBeforeEnter"
+          @after-enter="onAfterEnter"
+          @before-leave="onBeforeLeave"
+          @after-leave="onAfterLeave"
+      >
+        <div class="overlay" v-if="show">
+          <button style="display:none;" class="backPage" @click="close">
             <el-icon>
               <Back/>
             </el-icon>
           </button>
-          <card-detail :detail="detail" @afterDoComment="afterDoComment"/>
+          <card-detail :detail="detail" @afterDoComment="afterDoComment" ref="overlay"/>
         </div>
       </transition>
     </div>
@@ -294,75 +346,7 @@ onClickOutside(overlay, () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: white; /* 设置透明度的背景色 */
-  z-index: 9999; /* 设置一个较大的z-index值，确保图层位于其他内容之上 */
-  animation: scaleIn 0.5s forwards;
-}
-
-@keyframes scaleIn {
-  0% {
-    transform: scale(0);
-  }
-  5% {
-    transform: scale(0.1);
-  }
-  10% {
-    transform: scale(0.2);
-  }
-  15% {
-    transform: scale(0.3);
-  }
-  20% {
-    transform: scale(0.4);
-  }
-  25% {
-    transform: scale(0.5);
-  }
-  30% {
-    transform: scale(0.6);
-  }
-  35% {
-    transform: scale(0.7);
-  }
-  40% {
-    transform: scale(0.8);
-  }
-  45% {
-    transform: scale(0.9);
-  }
-  50% {
-    transform: scale(0.95);
-  }
-  55% {
-    transform: scale(0.97);
-  }
-  60% {
-    transform: scale(0.98);
-  }
-  65% {
-    transform: scale(0.99);
-  }
-  70% {
-    transform: scale(0.995);
-  }
-  75% {
-    transform: scale(0.997);
-  }
-  80% {
-    transform: scale(0.998);
-  }
-  85% {
-    transform: scale(0.999);
-  }
-  90% {
-    transform: scale(0.9995);
-  }
-  95% {
-    transform: scale(0.9997);
-  }
-  100% {
-    transform: scale(1);
-  }
+  z-index: 9999;
 }
 
 .backPage {
@@ -379,14 +363,11 @@ onClickOutside(overlay, () => {
   transition: all .3s;
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: all 0.5s;
+.fade-enter-active {
+  animation: scale-up-center 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
 }
 
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-  transform: scale(0.5);
+.fade-leave-active {
+  animation: scale-up-center 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both reverse;
 }
 </style>
